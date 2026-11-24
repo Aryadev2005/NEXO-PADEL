@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Courtwise · NEXO Padel demo</title>
+<meta name="description" content="Courtwise demo prepared for NEXO Padel: weekend fill, WhatsApp membership automations, player ladder, free-game rewards, game reminders and a 10-month season. Sample data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&family=Source+Sans+3:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --paper: #f4f5f2;        /* court-side concrete */
+  --surface: #ffffff;
+  --sunken: #e9ebe6;
+  --ink: #1e2a32;          /* slate, the colour of padel court frames */
+  --muted: #5e6b72;
+  --line: #d8ddd8;
+  --turf: #2f6db3;         /* indoor court turf */
+  --turf-out: #2a7f8f;     /* outdoor turf, a cooler teal-blue */
+  --turf-soft: #e1ebf6;
+  --glass: #b9d3e6;
+  --court-line: #ffffff;
+  --net: #1b252c;
+  --sand: #4d7c0f;
+  --sand-soft: #ecf5d9;
+  --plum: #6b4f94;  --plum-soft: #eee8f5;
+  --warn: #b26a06;  --warn-soft: #fbefdc; --warn-hatch: rgba(178, 106, 6, .16);
+  --good: #2c7a4e;  --good-soft: #dff1e6;
+  --crit: #b23a26;  --crit-soft: #fae6e1;
+  --heat-ink-hi: #ffffff;
+  --wa-wall: #ece5da; --wa-bubble: #ffffff; --wa-head: #1f6b58;
+  --av1: #3d6a8f; --av2: #2f7d72; --av3: #7a5a8f; --av4: #9a6a3c; --av5: #5f7a3a; --av6: #8f4e5c;
+  --font-d: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --font-b: "Source Sans 3", "Noto Sans Devanagari", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-hand: "Caveat", "Segoe Print", "Bradley Hand", cursive;
+  --font-ar: "Noto Sans Devanagari", "Source Sans 3", sans-serif;
+  /* legacy names used by components */
+  --bg: var(--paper); --accent: var(--turf); --accent-soft: var(--turf-soft); --gold: var(--sand); --gold-soft: var(--sand-soft);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #10181e; --surface: #17222a; --sunken: #1f2c35; --ink: #e6ebe8; --muted: #9aa8ad; --line: #2b3943;
+    --turf: #3f7fc4; --turf-out: #2f8b9a; --turf-soft: #183049; --glass: #4d6b80; --court-line: #e9f1f7; --net: #05090c;
+    --sand: #a3d65c; --sand-soft: #22300f; --plum: #b49be0; --plum-soft: #2a2140;
+    --warn: #f0b04f; --warn-soft: #33260f; --warn-hatch: rgba(240, 176, 79, .15);
+    --good: #62c793; --good-soft: #143022; --crit: #ff8f7c; --crit-soft: #3b1a15; --heat-ink-hi: #0b141a;
+    --wa-wall: #0f1a20; --wa-bubble: #1e2b33; --wa-head: #1c4a40;
+    --av1: #4f7ea3; --av2: #3c8f83; --av3: #8c6ba1; --av4: #a87b4c; --av5: #6f8b48; --av6: #a15f6d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #10181e; --surface: #17222a; --sunken: #1f2c35; --ink: #e6ebe8; --muted: #9aa8ad; --line: #2b3943;
+  --turf: #3f7fc4; --turf-out: #2f8b9a; --turf-soft: #183049; --glass: #4d6b80; --court-line: #e9f1f7; --net: #05090c;
+  --sand: #a3d65c; --sand-soft: #22300f; --plum: #b49be0; --plum-soft: #2a2140;
+  --warn: #f0b04f; --warn-soft: #33260f; --warn-hatch: rgba(240, 176, 79, .15);
+  --good: #62c793; --good-soft: #143022; --crit: #ff8f7c; --crit-soft: #3b1a15; --heat-ink-hi: #0b141a;
+  --wa-wall: #0f1a20; --wa-bubble: #1e2b33; --wa-head: #1c4a40;
+  --av1: #4f7ea3; --av2: #3c8f83; --av3: #8c6ba1; --av4: #a87b4c; --av5: #6f8b48; --av6: #a15f6d;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { background: var(--paper); color: var(--ink); }
+body { font-family: var(--font-b); font-size: 15px; line-height: 1.5; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--turf); outline-offset: 2px; }
+h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
+p { margin: 0; }
+.nums, td, .kpi-value { font-variant-numeric: tabular-nums; }
+.ar { font-family: var(--font-ar); }
+#boot { padding: 48px 16px; color: var(--muted); }
+
+/* ---------- top bar ---------- */
+.topnav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; background: var(--surface); border-bottom: 1px solid var(--line); }
+.topnav-in { max-width: 1440px; margin: 0 auto; padding: 0 28px; display: flex; align-items: center; gap: 22px; min-height: 64px; }
+.club { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.club-name { font-family: var(--font-d); font-stretch: 112%; font-weight: 750; font-size: 19px; line-height: 1; letter-spacing: -.01em; }
+.club select { border: 0; background: transparent; font-size: 14px; color: var(--muted); padding: 2px 0; margin-top: 3px; cursor: pointer; }
+.navlinks { display: flex; gap: 2px; overflow-x: auto; flex: 1; min-width: 0; align-self: stretch; }
+.navlinks button { border: 0; background: none; padding: 0 12px; font-size: 15px; font-weight: 500; color: var(--muted); white-space: nowrap; border-bottom: 2px solid transparent; position: relative; }
+.navlinks button:hover { color: var(--ink); }
+.navlinks button.on { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); }
+.navlinks .count { display: inline-block; margin-left: 6px; font-size: 12px; font-weight: 700; color: var(--warn); }
+.who { display: flex; align-items: center; gap: 9px; flex-shrink: 0; font-size: 14px; }
+.who .tag { font-size: 12px; color: var(--muted); border: 1px dashed var(--line); border-radius: 4px; padding: 2px 6px; }
+
+.main { max-width: 1440px; margin: 0 auto; padding: 28px 28px 40px; display: flex; flex-direction: column; gap: 26px; min-width: 0; }
+
+/* ---------- type ---------- */
+.page-title { font-family: var(--font-d); font-stretch: 112%; font-size: 32px; font-weight: 750; line-height: 1.05; letter-spacing: -.015em; }
+.page-sub { color: var(--muted); margin-top: 6px; font-size: 15.5px; max-width: 68ch; }
+.h2 { font-family: var(--font-d); font-stretch: 106%; font-size: 19px; font-weight: 700; line-height: 1.2; letter-spacing: -.005em; }
+.h3 { font-family: var(--font-d); font-size: 16px; font-weight: 650; line-height: 1.25; }
+.eyebrow { font-size: 13.5px; color: var(--muted); font-weight: 500; }
+.muted { color: var(--muted); }
+.small { font-size: 13.5px; }
+.tiny { font-size: 12.5px; }
+.t-warn { color: var(--warn); } .t-good { color: var(--good); } .t-crit { color: var(--crit); } .t-accent { color: var(--turf); } .t-plum { color: var(--plum); } .t-gold { color: var(--sand); }
+
+/* ---------- layout ---------- */
+.topbar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 20px; }
+.top-chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.stack { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.spread { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); gap: 26px; align-items: start; }
+.grid-2e { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; align-items: start; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+
+/* Panels: a box only where the content is a separate object */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 18px 20px; min-width: 0; }
+.card.plain { background: none; border: 0; padding: 0; border-radius: 0; }
+.card-h { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 14px; margin-bottom: 12px; }
+.card-h .eyebrow { margin-bottom: 2px; }
+
+/* Figures strip instead of tiles */
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.kpis.k3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.kpi { padding: 13px 18px 14px; min-width: 0; border-left: 1px solid var(--line); }
+.kpi:first-child { border-left: 0; padding-left: 0; }
+.kpi-label { font-size: 13.5px; color: var(--muted); }
+.kpi-value { font-family: var(--font-d); font-stretch: 108%; font-size: 26px; font-weight: 700; line-height: 1.15; margin-top: 2px; letter-spacing: -.01em; }
+.kpi-sub { font-size: 13px; color: var(--muted); }
+.grid-3 .kpi, .stack .kpi { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; }
+
+/* ---------- controls ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 6px; padding: 8px 13px; font-size: 14px; font-weight: 600; border: 1px solid var(--line); background: var(--surface); color: var(--ink); white-space: nowrap; }
+.btn:hover { border-color: var(--ink); }
+.btn-primary { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.btn-primary:hover { background: var(--turf); border-color: var(--turf); }
+.btn-warn { border-color: var(--warn); color: var(--warn); }
+.btn-warn:hover { background: var(--warn-soft); border-color: var(--warn); }
+.btn-ghost { border-color: transparent; background: transparent; color: var(--muted); padding: 6px 8px; }
+.btn-ghost:hover { color: var(--ink); border-color: transparent; }
+.btn-link { border: 0; background: none; padding: 0; color: var(--turf); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; white-space: nowrap; }
+.btn-link:hover { color: var(--ink); }
+.btn-lg { padding: 12px 16px; font-size: 15px; width: 100%; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 4px 9px; border-radius: 5px; background: var(--surface); border: 1px solid var(--line); white-space: nowrap; }
+.chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--good); }
+.pill { display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 600; padding: 1px 7px; border-radius: 4px; white-space: nowrap; }
+.pill-good { background: var(--good-soft); color: var(--good); }
+.pill-warn { background: var(--warn-soft); color: var(--warn); }
+.pill-crit { background: var(--crit-soft); color: var(--crit); }
+.pill-accent { background: var(--turf-soft); color: var(--turf); }
+.pill-plum { background: var(--plum-soft); color: var(--plum); }
+.pill-gold { background: var(--sand-soft); color: var(--sand); }
+.pill-muted { background: var(--sunken); color: var(--muted); }
+.seg { display: inline-grid; grid-auto-flow: column; gap: 2px; background: var(--sunken); padding: 3px; border-radius: 7px; max-width: 100%; overflow-x: auto; }
+.seg button { border: 0; background: transparent; padding: 5px 12px; border-radius: 5px; font-size: 14px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.seg button.on { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+.tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+.tabs button { border: 0; background: none; padding: 9px 4px 10px; margin-right: 14px; font-weight: 600; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; font-size: 15px; }
+.tabs button.on { color: var(--ink); border-bottom-color: var(--ink); }
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field label { font-size: 13.5px; color: var(--muted); }
+.input, select.input { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; font-size: 14.5px; width: 100%; }
+input[type=range] { width: 100%; accent-color: var(--ink); }
+.toggle { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+.toggle input { margin-top: 4px; accent-color: var(--ink); width: 16px; height: 16px; }
+.hatch { background-color: var(--warn-soft); background-image: repeating-linear-gradient(135deg, var(--warn-hatch) 0 2px, transparent 2px 7px); }
+.meter { height: 5px; border-radius: 3px; background: var(--sunken); overflow: hidden; }
+.meter > span { display: block; height: 100%; border-radius: 3px; background: var(--turf); }
+.avatar { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; letter-spacing: .02em; }
+.avatar.lg { width: 50px; height: 50px; font-size: 17px; }
+.avatar.sm { width: 26px; height: 26px; font-size: 10.5px; }
+.cam { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 600; color: var(--turf); }
+.divider { height: 1px; background: var(--line); }
+.list-row { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-top: 1px solid var(--line); }
+.list-row:first-child { border-top: 0; }
+
+table.tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tbl th { text-align: left; font-size: 13px; color: var(--muted); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--ink); white-space: nowrap; }
+.tbl td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.tbl tr.click { cursor: pointer; }
+.tbl tr.click:hover td { background: var(--paper); }
+.tbl .r { text-align: right; }
+.scroll-x { overflow-x: auto; min-width: 0; }
+
+/* ---------- today ---------- */
+.hello { font-family: var(--font-d); font-stretch: 115%; font-size: 40px; font-weight: 800; line-height: 1; letter-spacing: -.02em; }
+.briefing { font-size: 19px; line-height: 1.5; max-width: 62ch; margin-top: 10px; color: var(--ink); }
+.briefing b { font-weight: 700; }
+.briefing .w { color: var(--warn); font-weight: 700; }
+.today-grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr); gap: 30px; align-items: start; }
+.plan-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px 10px; }
+.plan-svg text { font-family: var(--font-b); }
+.plan-svg .court { cursor: pointer; }
+.plan-svg .court:hover .glass { stroke: var(--ink); }
+.note { position: relative; background: #fff8d9; color: #3b3220; padding: 16px 18px 18px; border-radius: 2px; transform: rotate(-.6deg); box-shadow: 0 1px 0 rgba(0,0,0,.06), 0 8px 18px -10px rgba(60,45,10,.35); font-family: var(--font-hand); font-size: 22px; line-height: 1.25; }
+.note::before { content: ""; position: absolute; top: -9px; left: 50%; width: 70px; height: 18px; margin-left: -35px; background: rgba(214, 205, 170, .55); transform: rotate(2deg); }
+.note .sig { display: block; text-align: right; margin-top: 6px; font-size: 20px; }
+:root[data-theme="dark"] .note { background: #3a3523; color: #f1e8c8; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .note { background: #3a3523; color: #f1e8c8; } }
+.feed-item { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 14.5px; }
+.feed-item:first-child { border-top: 0; }
+.feed-item time { color: var(--muted); font-size: 13px; padding-top: 1px; }
+.quote { display: block; margin-top: 4px; padding: 6px 10px; background: var(--wa-bubble); border: 1px solid var(--line); border-radius: 8px 8px 8px 2px; font-size: 14px; width: fit-content; max-width: 100%; }
+.quote[dir=rtl] { font-family: var(--font-ar); border-radius: 8px 8px 2px 8px; margin-left: auto; margin-right: 0; }
+.todo { display: grid; grid-template-columns: 4px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 13px 0; border-top: 1px solid var(--line); }
+.todo:first-child { border-top: 0; }
+.todo .mark { align-self: stretch; border-radius: 2px; }
+.todo-title { font-weight: 600; font-size: 15.5px; }
+.todo-body { color: var(--muted); font-size: 14px; margin-top: 1px; }
+.todo-actions { display: flex; align-items: center; gap: 12px; }
+
+/* ---------- court grid ---------- */
+.daytabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+.daytab { flex-shrink: 0; width: 126px; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 8px 11px; }
+.daytab.on { border-color: var(--ink); box-shadow: inset 0 -3px 0 var(--ink); }
+.daytab .d1 { font-size: 12.5px; color: var(--muted); }
+.daytab .d2 { font-family: var(--font-d); font-weight: 700; font-size: 16px; line-height: 1.2; white-space: nowrap; }
+.daytab .d3 { display: flex; justify-content: space-between; gap: 4px; font-size: 12px; margin-top: 4px; white-space: nowrap; }
+.cgrid { display: grid; gap: 5px; min-width: 360px; }
+.cgrid .hcell { padding: 0 4px 4px; }
+.cgrid .time { font-size: 13px; color: var(--muted); text-align: right; padding: 10px 6px 0 0; white-space: nowrap; }
+.cell { position: relative; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 5px; padding: 6px 8px; min-height: 54px; display: flex; flex-direction: column; justify-content: center; gap: 1px; font-size: 12.5px; line-height: 1.25; min-width: 0; }
+.cell:hover { border-color: var(--ink); }
+.cell > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cell.booked { background: var(--sunken); border-color: transparent; }
+.cell.short { background: var(--turf-soft); border-color: var(--turf); }
+.cell.lesson, .cell.academy { background: var(--plum-soft); border-color: transparent; }
+.cell.campaign { background: var(--good-soft); border-color: var(--good); }
+.cell.lost { border-style: dashed; opacity: .55; }
+.cell.watch { border-color: var(--warn); }
+.cell.dead { border-color: var(--warn); background-color: var(--warn-soft); background-image: repeating-linear-gradient(135deg, var(--warn-hatch) 0 2px, transparent 2px 7px); }
+.cell.sel { outline: 2px solid var(--ink); outline-offset: 1px; }
+.cell .src { font-size: 12px; font-weight: 600; color: var(--muted); }
+.cell .live { position: absolute; top: 6px; right: 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 3px var(--good-soft); }
+.cell .heat { position: absolute; top: 5px; right: 6px; color: var(--warn); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); }
+.legend i { display: inline-block; width: 15px; height: 11px; border-radius: 2px; border: 1px solid var(--line); vertical-align: -1px; margin-right: 5px; }
+
+/* ---------- heatmap ---------- */
+.heat-grid { display: grid; grid-template-columns: 58px repeat(7, minmax(46px, 1fr)); gap: 3px; min-width: 460px; }
+.heat-cell { border: 0; border-radius: 3px; height: 36px; font-size: 13px; font-weight: 600; position: relative; color: var(--ink); }
+.heat-cell.hi { color: var(--heat-ink-hi); }
+.heat-cell.sel { outline: 2px solid var(--ink); outline-offset: 1px; }
+.heat-cell .dn { position: absolute; top: 2px; right: 2px; min-width: 15px; height: 15px; border-radius: 3px; background: var(--warn); color: var(--surface); font-size: 10px; font-weight: 700; display: grid; place-items: center; padding: 0 3px; }
+.heat-head { font-size: 12.5px; color: var(--muted); text-align: center; line-height: 1.2; }
+.heat-time { font-size: 12.5px; color: var(--muted); text-align: right; padding-right: 4px; align-self: center; }
+.ramp { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
+.ramp span.bar { width: 110px; height: 8px; border-radius: 2px; background: linear-gradient(90deg, color-mix(in oklab, var(--turf) 6%, var(--surface)), var(--turf)); }
+
+/* ---------- whatsapp ---------- */
+.wa { border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+.wa-head { background: var(--wa-head); color: #fff; padding: 9px 12px; display: flex; align-items: center; gap: 9px; }
+.wa-av { width: 30px; height: 30px; border-radius: 50%; background: #d4ad6c; color: #1e2a32; display: grid; place-items: center; font-size: 11px; font-weight: 800; }
+.wa-wall { background: var(--wa-wall); padding: 12px; }
+.wa-bubble { background: var(--wa-bubble); border-radius: 9px; border-top-left-radius: 2px; max-width: 94%; font-size: 14px; box-shadow: 0 1px 1px rgba(0,0,0,.08); }
+.wa-bubble[dir=rtl] { border-top-left-radius: 9px; border-top-right-radius: 2px; margin-left: auto; font-family: var(--font-ar); }
+.wa-text { padding: 9px 11px 3px; white-space: pre-line; overflow-wrap: anywhere; }
+.wa-time { padding: 0 11px 6px; text-align: right; font-size: 11px; color: var(--muted); }
+.wa-btn { display: block; text-align: center; padding: 8px; border-top: 1px solid var(--line); color: #2b7ac2; font-weight: 600; font-size: 14px; }
+.var { background: var(--turf-soft); border-radius: 3px; padding: 0 2px; }
+
+/* ---------- drawer, toast ---------- */
+.scrim { position: fixed; inset: 0; background: rgba(10, 18, 24, .4); z-index: 40; display: flex; justify-content: flex-end; }
+.drawer { width: min(460px, 100%); height: 100%; background: var(--surface); box-shadow: -10px 0 30px rgba(0,0,0,.16); display: flex; flex-direction: column; animation: slidein .18s ease-out; }
+@keyframes slidein { from { transform: translateX(24px); opacity: .6; } to { transform: none; opacity: 1; } }
+.drawer-h { padding: calc(16px + env(safe-area-inset-top, 0px)) 20px 12px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.drawer-b { padding: 16px 20px calc(24px + env(safe-area-inset-bottom, 0px)); overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+.toasts { position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 60; display: flex; flex-direction: column; gap: 8px; max-width: min(380px, calc(100% - 32px)); }
+.toast { background: var(--ink); color: var(--surface); border-radius: 6px; padding: 11px 14px; font-size: 14px; display: flex; gap: 9px; align-items: flex-start; animation: up .2s ease-out; box-shadow: 0 6px 20px rgba(0,0,0,.18); }
+@keyframes up { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ---------- misc ---------- */
+.court-now { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.court-now.play { border-color: var(--good); background: var(--good-soft); }
+.price-big { font-family: var(--font-d); font-stretch: 108%; font-size: 36px; font-weight: 750; line-height: 1; letter-spacing: -.015em; }
+.strike { text-decoration: line-through; color: var(--muted); }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 5px 16px; font-size: 14px; }
+.kv dt { color: var(--muted); } .kv dd { margin: 0; }
+.steps { width: 100%; border-collapse: collapse; font-size: 14px; }
+.steps td { padding: 6px 0; border-top: 1px solid var(--line); }
+.steps td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+.product { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 11px 12px; display: flex; flex-direction: column; gap: 2px; min-height: 92px; }
+.product:hover { border-color: var(--ink); }
+.prod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.plan { border: 1px solid var(--line); border-radius: 6px; padding: 16px; background: var(--surface); display: flex; flex-direction: column; gap: 8px; }
+.plan.feature { border-color: var(--sand); box-shadow: inset 0 3px 0 var(--sand); }
+.invoice { border: 1px solid var(--line); border-radius: 6px; padding: 18px; font-size: 14px; display: flex; flex-direction: column; gap: 10px; }
+.chart-tip { font-size: 12.5px; fill: var(--ink); font-weight: 700; }
+.foot { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 18px; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 14px; }
+
+@media (max-width: 1180px) {
+  .grid-2, .today-grid { grid-template-columns: minmax(0, 1fr); }
+  .kpis, .kpis.k3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi:nth-child(3) { border-left: 0; padding-left: 0; }
+  .kpi:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .topnav-in { flex-wrap: wrap; padding: 10px 16px 0; gap: 4px 12px; }
+  .who { margin-left: auto; }
+  .who .name { display: none; }
+  .navlinks { order: 3; flex-basis: 100%; height: 42px; }
+  .navlinks button { padding: 0 9px; font-size: 14.5px; }
+  .main { padding: 20px 16px 32px; gap: 22px; }
+  .grid-2e, .grid-3 { grid-template-columns: minmax(0, 1fr); }
+  .page-title { font-size: 27px; }
+  .hello { font-size: 32px; }
+  .briefing { font-size: 17px; }
+}
+@media (max-width: 520px) {
+  .kpi { padding: 10px 10px 11px; }
+  .kpi:nth-child(odd) { padding-left: 0; }
+  .kpi-value { font-size: 21px; }
+  .grid-4 { grid-template-columns: minmax(0, 1fr); }
+  .todo { grid-template-columns: 4px minmax(0, 1fr); }
+  .todo-actions { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+
+/* ---------- NEXO additions ---------- */
+.ladder { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.rung { padding: 12px 14px 14px; border-left: 1px solid var(--line); text-align: left; background: none; border-top: 0; border-right: 0; border-bottom: 0; position: relative; }
+.rung:first-child { border-left: 0; }
+.rung:hover { background: var(--surface); }
+.rung.on { background: var(--surface); box-shadow: inset 0 -3px 0 var(--ink); }
+.rung .n { font-family: var(--font-d); font-stretch: 108%; font-size: 26px; font-weight: 700; line-height: 1.1; }
+.rung .arrow { position: absolute; right: -8px; top: 50%; margin-top: -8px; width: 16px; height: 16px; background: var(--paper); color: var(--muted); display: grid; place-items: center; font-size: 12px; z-index: 1; }
+.loyal { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+.loyal span { aspect-ratio: 1; border-radius: 50%; border: 2px dashed var(--line); display: grid; place-items: center; font-size: 11px; font-weight: 700; color: var(--muted); }
+.loyal span.done { border: 0; background: var(--sand); color: #fff; }
+.loyal span.gift { border-color: var(--sand); color: var(--sand); }
+.mini-loyal { display: inline-flex; gap: 2px; vertical-align: middle; }
+.mini-loyal i { width: 6px; height: 6px; border-radius: 50%; background: var(--line); display: inline-block; }
+.mini-loyal i.done { background: var(--sand); }
+.flow { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 10px; border-top: 1px solid var(--line); text-align: left; width: 100%; background: none; border-left: 0; border-right: 0; border-bottom: 0; border-radius: 0; }
+.flow:first-child { border-top: 0; }
+.flow:hover { background: var(--paper); }
+.flow.on { background: var(--paper); box-shadow: inset 3px 0 0 var(--ink); }
+.flow .ico { width: 34px; height: 34px; border-radius: 8px; display: grid; place-items: center; background: var(--sunken); color: var(--ink); }
+.switch { position: relative; width: 38px; height: 22px; border-radius: 11px; border: 0; background: var(--line); flex-shrink: 0; padding: 0; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left .15s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+.switch.on { background: var(--good); }
+.switch.on::after { left: 19px; }
+.timeline { display: flex; flex-direction: column; gap: 0; }
+.tl { display: grid; grid-template-columns: 70px 14px minmax(0, 1fr); gap: 10px; font-size: 14px; }
+.tl .t { color: var(--muted); font-size: 13px; text-align: right; padding-top: 1px; }
+.tl .rail { position: relative; }
+.tl .rail::before { content: ""; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: var(--line); }
+.tl .rail::after { content: ""; position: absolute; left: 2px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ink); }
+.tl .rail.done::after { background: var(--good); border-color: var(--good); }
+.tl .b { padding-bottom: 14px; }
+.month-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; }
+.month { border-radius: 4px; padding: 8px 4px; text-align: center; font-size: 12.5px; font-weight: 600; }
+.month.open { background: var(--turf-soft); color: var(--turf); }
+.month.closed { background: var(--sunken); color: var(--muted); background-image: repeating-linear-gradient(135deg, rgba(0,0,0,.06) 0 2px, transparent 2px 7px); }
+.month.now { outline: 2px solid var(--ink); outline-offset: 1px; }
+.hours-tbl td, .hours-tbl th { padding: 7px 8px; }
+.cell.weekend-open { border-color: var(--warn); border-style: dashed; }
+.cell.campaign { background: var(--good-soft); border-color: var(--good); }
+.cell.closed { background: none; border: 0; }
+.play { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; background: var(--surface); display: flex; flex-direction: column; gap: 6px; }
+.play.on { border-color: var(--good); box-shadow: inset 0 3px 0 var(--good); }
+@media (max-width: 1180px) { .ladder { grid-template-columns: repeat(3, minmax(0, 1fr)); } .rung:nth-child(4) { border-left: 0; } .rung:nth-child(n+4) { border-top: 1px solid var(--line); } .rung .arrow { display: none; } }
+@media (max-width: 520px) { .ladder { grid-template-columns: repeat(2, minmax(0, 1fr)); } .rung:nth-child(odd) { border-left: 0; } .rung:nth-child(4) { border-left: 1px solid var(--line); } .rung:nth-child(n+3) { border-top: 1px solid var(--line); } .month-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+</style>
+</head>
+<body>
+<div id="root"><div id="boot">Loading the club suite…</div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script>
+/* =======================================================================
+   COURTWISE · demo prepared for NEXO Padel (UK) · sample data
+
+   Built around the seven things NEXO asked for:
+     1. Weekends that don't get booked       → Weekend fill page
+     2. WhatsApp automation for memberships   → Automations page
+     3. Once-a-month players → regulars → members → Players ladder
+     4. Open 20 hours a week                  → opening hours drive every grid
+     5. Open 10 months a year                 → Season page, paused memberships
+     6. Reward: free game after 10 games      → loyalty card on every player
+     7. Game reminders before each slot       → 24 h and 2 h reminders
+
+   Everything runs on generated sample data in the browser. Search for
+   "INTEGRATION" to see where live systems connect in production.
+   ======================================================================= */
+const { useState, useMemo, useEffect } = React;
+const h = React.createElement;
+const Frag = React.Fragment;
+
+/* ---------------- Configuration (all sample, confirm with the club) ---------------- */
+const BRAND = 'Courtwise';
+const CLUB = 'NEXO Padel';
+const CONTACT = { name: 'Aryadev Chatterjee', phones: ['+91 86378 59578', '+91 82403 48911'] };
+const VAT = 0.2;
+const COURTS = [{ id: 'C1', name: 'Court 1' }, { id: 'C2', name: 'Court 2' }];
+// Opening hours: 20 hours a week. Keys are weekday numbers (0 = Sunday), values are start hours.
+const HOURS = { 1: [18, 19, 20], 2: [18, 19, 20], 3: [18, 19, 20], 4: [18, 19, 20], 5: [17, 18, 19, 20], 6: [10, 11], 0: [10, 11] };
+const HOURS_PER_WEEK = Object.values(HOURS).reduce((a, x) => a + x.length, 0); // 20
+// Season: 10 months open, February to November. Closed December and January.
+const SEASON_OPEN = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const PRICE = { weekday: 15, weekend: 15 }; // £15 per court per hour, every day, incl. VAT
+const SHARE = PRICE.weekday / 4; // £3.75 per player
+const REWARD_DEFAULT = 10; // games for one free game
+
+/* ---------------- Utilities ---------------- */
+function mulberry32(seed) {
+  return function () {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+const sum = (arr, f) => arr.reduce((a, x) => a + f(x), 0);
+const gbp = n => '£' + (Math.abs(n - Math.round(n)) < .005 ? Math.round(n).toLocaleString('en-GB') : n.toFixed(2));
+const pct = p => Math.round(p * 100) + '%';
+const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DOW_LONG = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MON_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const isWeekend = dow => dow === 0 || dow === 6;
+const hh = hr => String(hr).padStart(2, '0') + ':00';
+const slotText = hr => `${hh(hr)}–${hh(hr + 1)}`;
+
+// Demo clock: today at 16:10, before the evening games. If today falls in the
+// closed months, the demo jumps to early March so there is a season to show.
+const NOW = (() => {
+  const d = new Date();
+  if (!SEASON_OPEN.includes(d.getMonth())) d.setMonth(2, 3);
+  d.setHours(16, 10, 0, 0);
+  return d;
+})();
+const NOW_MS = NOW.getTime();
+const DAYS = Array.from({ length: 7 }, (_, i) => { const d = new Date(NOW); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + i); return d; });
+const dayWord = i => i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : DOW_LONG[DAYS[i].getDay()];
+const dayShort = i => `${DOW[DAYS[i].getDay()]} ${DAYS[i].getDate()} ${MON[DAYS[i].getMonth()]}`;
+const seasonEnd = (() => { const y = NOW.getFullYear(); return new Date(y, 11, 0); })(); // 30 Nov
+const reopen = new Date(NOW.getFullYear() + 1, 1, 1);
+const daysToSeasonEnd = Math.max(0, Math.ceil((seasonEnd - NOW) / 864e5));
+
+/* ---------------- Players ----------------
+   INTEGRATION — Players come from Playtomic exports, the club's own booking page
+   and WhatsApp, joined on phone number. Only opted-in players get offers. */
+const FIRST = ['Sam', 'Olivia', 'Jack', 'Amelia', 'Harry', 'Isla', 'Oscar', 'Ava', 'Leo', 'Mia', 'Charlie', 'Freya', 'George', 'Grace', 'Alfie', 'Ella', 'Noah', 'Lily', 'Theo', 'Sophie', 'Arjun', 'Priya', 'Tom', 'Hannah', 'Ben', 'Chloe', 'Max', 'Zara', 'Dan', 'Ruby', 'Luca', 'Megan', 'Ryan', 'Aisha', 'Will', 'Evie'];
+const LAST = ['Walker', 'Patel', 'Hughes', 'Clarke', 'Evans', 'Khan', 'Turner', 'Wright', 'Hall', 'Shaw', 'Begum', 'Wood', 'Cooper', 'Morgan', 'Bell', 'Ahmed', 'Price', 'Fraser', 'Lloyd', 'Kelly', 'Mason', 'Reid', 'Doyle', 'Singh', 'Young', 'Hart', 'Chapman', 'Nolan', 'Ellis', 'Barker'];
+const STAGES = [
+  { id: 'new', name: 'New', sub: '1 game so far', tone: 'accent' },
+  { id: 'monthly', name: 'Once a month', sub: '2–4 games in 90 days', tone: 'warn' },
+  { id: 'fortnightly', name: 'Every 2 weeks', sub: '5–9 games in 90 days', tone: 'plum' },
+  { id: 'weekly', name: 'Weekly', sub: '10+ games, no plan', tone: 'gold' },
+  { id: 'member', name: 'Members', sub: 'On a plan', tone: 'good' },
+  { id: 'lapsed', name: 'Lapsed', sub: 'No game in 45 days', tone: 'crit' }
+];
+const SMAP = Object.fromEntries(STAGES.map(s => [s.id, s]));
+const PLANS = [
+  { id: 'regular', name: 'NEXO Regular', price: 12, per: 'month', desc: 'Four games a month included, booking 14 days ahead, 10% off extra games. Billed only in the months the club is open.', feature: true },
+  { id: 'weekend', name: 'Weekend Club', price: 5, per: 'month', desc: 'Half-price weekend courts (£7.50 a court) and free entry to the Saturday Americano.', note: 'Built to fill weekends' },
+  { id: 'season', name: 'Season Pass', price: 99, per: 'season', desc: 'NEXO Regular for the whole 10-month season, paid once. Works out at £9.90 a month.' }
+];
+const PLAN_MAP = Object.fromEntries(PLANS.map(p => [p.id, p]));
+const PLAYERS = (() => {
+  const rnd = mulberry32(2026);
+  const mix = [['new', 14], ['monthly', 30], ['fortnightly', 16], ['weekly', 12], ['member', 18], ['lapsed', 10]];
+  const range = (a, b) => a + Math.floor(rnd() * (b - a + 1));
+  const out = [];
+  let i = 0;
+  const planMix = ['regular', 'regular', 'regular', 'weekend', 'regular', 'season', 'regular', 'weekend', 'regular', 'regular', 'season', 'regular', 'weekend', 'regular', 'regular', 'season', 'weekend', 'regular'];
+  let pm = 0;
+  mix.forEach(([stage, n]) => {
+    for (let k = 0; k < n; k++, i++) {
+      const first = FIRST[i % FIRST.length];
+      const last = LAST[(i * 7 + 3) % LAST.length];
+      const g = {
+        new: [1, 1, 1, 1, 2, 20],
+        monthly: [3, 9, 2, 4, 10, 30],
+        fortnightly: [8, 19, 5, 9, 4, 14],
+        weekly: [14, 39, 10, 14, 0, 6],
+        member: [20, 59, 8, 14, 0, 9],
+        lapsed: [2, 9, 0, 0, 46, 110]
+      }[stage];
+      const total = range(g[0], g[1]);
+      const g90 = Math.min(total, range(g[2], g[3]));
+      const plan = stage === 'member' ? planMix[pm++] : null;
+      const weekendGames = plan === 'weekend' ? range(3, 8) : rnd() < .22 ? range(1, 3) : 0;
+      out.push({
+        id: 'p' + i,
+        name: `${first} ${last}`,
+        first,
+        initials: first[0] + last[0],
+        phone: `+44 7${range(100, 999)} ••• ${range(100, 999)}`,
+        stage,
+        plan,
+        total,
+        g90,
+        lastDays: range(g[4], g[5]),
+        weekendGames,
+        spend90: g90 * SHARE,
+        optIn: rnd() < .92,
+        source: ['Playtomic', 'Playtomic', 'WhatsApp', 'Walk-in', 'Friend referral'][range(0, 4)],
+        unredeemed: total >= 10 && rnd() < .35 ? 1 : 0
+      });
+    }
+  });
+  // Make sure a few players are one game away from a free one, for the story.
+  ['p17', 'p33', 'p48', 'p52', 'p61'].forEach((id, k) => { const p = out.find(x => x.id === id); if (p) p.total = [9, 19, 29, 9, 19][k]; });
+  return out;
+})();
+const PMAP = new Map(PLAYERS.map(p => [p.id, p]));
+const shortName = id => { const p = PMAP.get(id); return p ? `${p.first} ${p.name.split(' ')[1][0]}.` : 'Guest'; };
+const rewardProgress = (p, every) => p.total % every;
+const earned = (p, every) => Math.floor(p.total / every);
+function nextMessage(p, every) {
+  if (!p.optIn) return 'Game reminders only (no offers: not opted in)';
+  if (rewardProgress(p, every) === every - 1) return 'Reward: "one more game and the next is free"';
+  if (p.stage === 'new') return 'Welcome + half-price second game within 14 days';
+  if (p.stage === 'monthly') return 'Play-again nudge, 21 days after the last game';
+  if (p.stage === 'fortnightly' || p.stage === 'weekly') return `Membership offer: "you'd have saved ${gbp(Math.max(2, p.g90 / 3 * SHARE - 12))} last month"`;
+  if (p.stage === 'lapsed') return 'Win-back: first game back, your share is on us';
+  if (p.plan === 'regular' || p.plan === 'season') return 'Weekend courts every Thursday';
+  return 'Saturday Americano invite';
+}
+
+/* ---------------- Bookings ----------------
+   INTEGRATION — Bookings arrive from Playtomic (venue integration or scheduled
+   export), the club's booking page and WhatsApp, deduplicated on (court, start).
+   Here a seeded generator stands in for all of them. */
+const OCC = { wd: { 17: .5, 18: .88, 19: .96, 20: .78 }, we: { 10: .34, 11: .24 } };
+const ACTIVE = PLAYERS.filter(p => p.stage !== 'lapsed');
+function genSlots() {
+  const rnd = mulberry32(919);
+  const pick = n => { const s = new Set(); while (s.size < n) s.add(ACTIVE[Math.floor(rnd() * ACTIVE.length)].id); return [...s]; };
+  const out = [];
+  DAYS.forEach((date, d) => {
+    const dow = date.getDay();
+    (HOURS[dow] || []).forEach(hr => COURTS.forEach((court, ci) => {
+      const we = isWeekend(dow);
+      const ts = date.getTime() + hr * 36e5;
+      const occ = (we ? OCC.we : OCC.wd)[hr] * [1, .97, .93, .9, .86, .83, .8][d];
+      let booking = null;
+      if (rnd() < occ) {
+        const r = rnd();
+        const players = pick(4);
+        booking = {
+          source: r < .42 ? 'Playtomic' : r < .64 ? 'WhatsApp' : r < .88 ? 'Member' : 'Front desk',
+          players,
+          price: we ? PRICE.weekend : PRICE.weekday,
+          free: rnd() < .1 ? 1 : 0,
+          confirmed: rnd() < .8 ? 4 : 3,
+          dropout: false
+        };
+      }
+      out.push({ id: `${d}-${hr}-${court.id}`, d, dow, hr, we, court, ci, ts, base: we ? PRICE.weekend : PRICE.weekday, booking });
+    }));
+  });
+  // One player dropped out of tonight's game after the 24 h reminder: the spot went to the waitlist.
+  const tonight = out.find(s => s.d === 0 && s.booking && s.hr === 19);
+  if (tonight) { tonight.booking.dropout = true; tonight.booking.confirmed = 4; }
+  return out;
+}
+function reminderState(s) {
+  const until = (s.ts - NOW_MS) / 36e5;
+  const r24at = new Date(s.ts - 24 * 36e5), r2at = new Date(s.ts - 2 * 36e5);
+  const fmt = d => `${DOW[d.getDay()]} ${hh(d.getHours())}`;
+  return {
+    until,
+    r24: until <= 24 ? 'Sent' : `Goes ${fmt(r24at)}`,
+    r24sent: until <= 24,
+    r2: until <= 2 ? 'Sent' : `Goes ${until <= 24 ? 'today ' + hh(r2at.getHours()) : fmt(r2at)}`,
+    r2sent: until <= 2
+  };
+}
+
+/* ---------------- WhatsApp automations ----------------
+   INTEGRATION — WhatsApp Business Platform (Cloud API). Every send is a
+   pre-approved template from NEXO's own number, only to opted-in players;
+   "Stop offers" unsubscribes at once. Button taps arrive on a webhook that
+   books, confirms or releases the court and takes payment by card link. */
+const FLOWS = [
+  {
+    id: 'r24', group: 'Reminders', icon: 'bell', name: 'Game reminder, 24 hours before',
+    trigger: 'Every booking, 24 hours before the start', audience: 'All four players on the booking',
+    outcomeLabel: 'Late no-shows', stats: { sent: 612, outcome: '3', note: 'down from 19 the month before' },
+    msg: () => ({ text: `Hi {{Sam}}, you're playing at ${CLUB} tomorrow, {{18:00–19:00}} on {{Court 1}}.\nTap I'm in so your group knows. Can't make it? Tap below and we'll offer your spot to the waitlist.`, buttons: ["I'm in ✓", "Can't make it", 'Add to calendar'] })
+  },
+  {
+    id: 'r2', group: 'Reminders', icon: 'bell', name: 'Game reminder, 2 hours before',
+    trigger: 'Every booking, 2 hours before the start', audience: 'All four players on the booking',
+    outcomeLabel: 'Opened', stats: { sent: 598, outcome: '91%' },
+    msg: () => ({ text: `See you at {{18:00}} on {{Court 1}}, {{Sam}}! 🎾\nDoors open 10 minutes early. Racket hire is £2 at the desk.\nThis game is number {{7}} of 10 towards your free game.`, buttons: ['Get directions'] })
+  },
+  {
+    id: 'welcome', group: 'Memberships', icon: 'spark', name: 'New player: welcome and second game',
+    trigger: 'The morning after a player\'s first game', audience: 'First-time players',
+    outcomeLabel: 'Booked a 2nd game', stats: { sent: 41, outcome: '46%' },
+    msg: () => ({ text: `Thanks for your first game at ${CLUB}, {{Sam}}! 🎾\nBook a second game in the next 14 days and your share is half price.\nEvery game counts towards a free one: 1 of 10 done.`, buttons: ['Book game 2', 'See memberships', 'Stop offers'] })
+  },
+  {
+    id: 'repeat', group: 'Memberships', icon: 'card', name: 'Repeat player: membership offer',
+    trigger: 'Third game within 30 days', audience: 'Players not on a plan',
+    outcomeLabel: 'Joined a plan', stats: { sent: 23, outcome: '26%' },
+    msg: () => ({ text: `{{Sam}}, that's 3 games this month ({{£11.25}}). One more and NEXO Regular works out cheaper: £12 for four games, plus booking 14 days ahead.\nJoin this week and your first month is half price.`, buttons: ['Join NEXO Regular', 'Tell me more', 'Not now'] })
+  },
+  {
+    id: 'monthly', group: 'Memberships', icon: 'repeat', name: 'Once-a-month player: play again',
+    trigger: '21 days after the last game', audience: 'Players on 2–4 games in 90 days',
+    outcomeLabel: 'Booked within 7 days', stats: { sent: 58, outcome: '31%' },
+    msg: () => ({ text: `Hi {{Sam}}, it's been 3 weeks since your last game.\nPlay two weeks in a row and your second game is half price. Free this week:\n• {{Thu 20:00}} · Court 2\n• {{Sat 10:00}} · both courts`, buttons: ['Book a court', 'Find me a game', 'Stop offers'] })
+  },
+  {
+    id: 'ladder', group: 'Memberships', icon: 'card', name: 'Regular, no plan: savings nudge',
+    trigger: 'First of each month', audience: 'Players on 5+ games a month without a plan',
+    outcomeLabel: 'Joined a plan', stats: { sent: 28, outcome: '18%' },
+    msg: () => ({ text: `{{Sam}}, you played {{6}} games at ${CLUB} last month and paid {{£22.50}}.\nOn NEXO Regular that would have been £12 plus £6.75 for the extra two, and you'd book 14 days ahead.`, buttons: ['Switch to Regular', 'Not now'] })
+  },
+  {
+    id: 'reward', group: 'Rewards', icon: 'gift', name: 'Free game after 10 games',
+    trigger: 'After the 9th and the 10th game', audience: 'Every player, members included',
+    outcomeLabel: 'Free games used', stats: { sent: 37, outcome: '22' },
+    msg: () => ({ text: `🎉 {{Sam}}, that's 10 games at ${CLUB}. Your next game is on us!\nWe've added a free-game voucher to your account. It's valid until the end of the season.`, buttons: ['Book my free game'] })
+  },
+  {
+    id: 'weekend', group: 'Weekends', icon: 'sun', name: 'Thursday: weekend courts',
+    trigger: 'Every Thursday at 12:00, if weekend courts are free', audience: 'Weekday players who rarely play weekends',
+    outcomeLabel: 'Weekend court-hours sold', stats: { sent: 164, outcome: '9' },
+    msg: () => ({ text: `Weekend courts at ${CLUB}, {{Sam}}:\n• {{Sat 10:00–11:00}} · £15 a court (£3.75 each)\n• {{Sun 11:00–12:00}} · £15 a court\nWeekend Club members pay £7.50 a court.`, buttons: ['Book a weekend court', 'Join Weekend Club', 'Stop offers'] })
+  },
+  {
+    id: 'winback', group: 'Memberships', icon: 'repeat', name: 'Lapsed player: win-back',
+    trigger: '45 days without a game', audience: 'Players who used to play monthly or more',
+    outcomeLabel: 'Came back', stats: { sent: 19, outcome: '21%' },
+    msg: () => ({ text: `We've missed you at ${CLUB}, {{Sam}}!\nBook a game in the next 10 days and your share is on us.`, buttons: ['Book a court', 'Stop offers'] })
+  },
+  {
+    id: 'season', group: 'Season', icon: 'cal', name: 'Season end: next season early bird',
+    trigger: '3 weeks before the season closes', audience: 'Everyone who played this season',
+    outcomeLabel: 'Season Passes sold', stats: { sent: 0, outcome: '—', note: 'starts this week' },
+    msg: () => ({ text: `${CLUB} closes for the winter on 30 November and reopens on 1 February.\nLock in the ${reopen.getFullYear()} Season Pass now at the early price, £79 (usually £99). Pass holders get first pick of courts when we reopen.`, buttons: ['Get the Season Pass', 'Remind me in January'] })
+  },
+  {
+    id: 'reopen', group: 'Season', icon: 'cal', name: 'Season reopening',
+    trigger: '10 days before reopening', audience: 'Everyone from last season',
+    outcomeLabel: 'Booked opening week', stats: { sent: 0, outcome: '—', note: 'runs late January' },
+    msg: () => ({ text: `We're back on 1 February, {{Sam}}! 🎾 Courts for opening week are bookable now.\nSeason Pass holders: your booking window opened today.`, buttons: ['Book opening week', 'See memberships'] })
+  }
+];
+
+/* =======================================================================
+   UI
+   ======================================================================= */
+const ICONS = {
+  home: 'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
+  bell: 'M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0',
+  spark: 'M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6',
+  card: 'M3 6h18v12H3zM3 10h18M7 15h4',
+  repeat: 'M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3',
+  gift: 'M4 11h16v10H4zM2 7h20v4H2zM12 7v14M12 7S10.5 3 8 3a2 2 0 0 0 0 4M12 7s1.5-4 4-4a2 2 0 0 1 0 4',
+  sun: 'M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4',
+  cal: 'M4 5h16v16H4zM4 9h16M8 3v4M16 3v4',
+  check: 'M5 12.5l4.5 4.5L19 7',
+  x: 'M6 6l12 12M18 6 6 18',
+  search: 'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4'
+};
+function Icon({ name, size = 18, stroke = 1.8 }) {
+  return h('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: stroke, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': 'true' }, h('path', { d: ICONS[name] }));
+}
+function Mark({ size = 30 }) {
+  return h('svg', { width: size, height: size, viewBox: '0 0 40 40', 'aria-hidden': 'true' },
+    h('rect', { x: 3, y: 3, width: 34, height: 34, rx: 8, fill: 'var(--ink)' }),
+    h('path', { d: 'M12 28V12l16 16V12', fill: 'none', stroke: 'var(--sand)', strokeWidth: 3.4, strokeLinecap: 'round', strokeLinejoin: 'round' }));
+}
+function Kpi({ label, value, sub, tone }) {
+  return h('div', { className: 'kpi' }, h('div', { className: 'kpi-label' }, label), h('div', { className: `kpi-value ${tone ? 't-' + tone : ''}` }, value), sub && h('div', { className: 'kpi-sub' }, sub));
+}
+function Card({ eyebrow, title, right, children, className = '', style }) {
+  return h('section', { className: `card ${className}`, style },
+    (eyebrow || title || right) && h('div', { className: 'card-h' }, h('div', { style: { minWidth: 0 } }, eyebrow && h('div', { className: 'eyebrow' }, eyebrow), title && h('h2', { className: 'h2' }, title)), right),
+    children);
+}
+function PageHead({ title, sub, children }) {
+  return h('div', { className: 'topbar' }, h('div', null, h('h1', { className: 'page-title' }, title), sub && h('p', { className: 'page-sub' }, sub)), h('div', { className: 'top-chips' }, children));
+}
+function Seg({ value, options, onChange, label }) {
+  return h('div', { className: 'seg', role: 'radiogroup', 'aria-label': label }, options.map(([v, l]) => h('button', { key: v, role: 'radio', 'aria-checked': value === v, className: value === v ? 'on' : '', onClick: () => onChange(v) }, l)));
+}
+function Meter({ value, tone }) {
+  return h('div', { className: 'meter' }, h('span', { style: { width: pct(clamp(value, 0, 1)), background: tone ? `var(--${tone})` : undefined } }));
+}
+function Switch({ on, onChange, label }) {
+  return h('button', { className: `switch ${on ? 'on' : ''}`, role: 'switch', 'aria-checked': on, 'aria-label': label, onClick: e => { e.stopPropagation(); onChange(!on); } });
+}
+function Drawer({ open, onClose, eyebrow, title, children }) {
+  useEffect(() => {
+    if (!open) return;
+    const k = e => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', k);
+    return () => window.removeEventListener('keydown', k);
+  }, [open, onClose]);
+  if (!open) return null;
+  return h('div', { className: 'scrim', onClick: onClose },
+    h('aside', { className: 'drawer', role: 'dialog', 'aria-label': title, onClick: e => e.stopPropagation() },
+      h('div', { className: 'drawer-h' }, h('div', { style: { minWidth: 0 } }, eyebrow && h('div', { className: 'eyebrow' }, eyebrow), h('h2', { className: 'h2' }, title)),
+        h('button', { className: 'btn btn-ghost', onClick: onClose, 'aria-label': 'Close' }, h(Icon, { name: 'x' }))),
+      h('div', { className: 'drawer-b' }, children)));
+}
+const AV = ['--av1', '--av2', '--av3', '--av4', '--av5', '--av6'];
+const avColor = id => `var(${AV[[...String(id)].reduce((a, c) => a + c.charCodeAt(0) * 7, 0) % AV.length]})`;
+function Avatar({ id, lg, sm }) {
+  const p = PMAP.get(id);
+  return h('span', { className: `avatar ${lg ? 'lg' : ''} ${sm ? 'sm' : ''}`, style: { background: avColor(id) } }, p ? p.initials : '?');
+}
+function StagePill({ stage }) {
+  const s = SMAP[stage];
+  return h('span', { className: `pill pill-${s.tone === 'gold' ? 'gold' : s.tone}` }, s.name);
+}
+function MiniLoyal({ p, every }) {
+  const n = rewardProgress(p, every);
+  return h('span', { className: 'row', style: { gap: 6, flexWrap: 'nowrap' } },
+    h('span', { className: 'mini-loyal', 'aria-hidden': 'true' }, Array.from({ length: every }, (_, i) => h('i', { key: i, className: i < n ? 'done' : '' }))),
+    h('span', { className: 'tiny muted nums' }, `${n}/${every}`));
+}
+function LoyaltyCard({ p, every }) {
+  const n = rewardProgress(p, every);
+  return h('div', { className: 'stack', style: { gap: 8 } },
+    h('div', { className: 'spread' }, h('b', null, 'Free-game card'), h('span', { className: 'tiny muted' }, `${earned(p, every)} free game${earned(p, every) === 1 ? '' : 's'} earned so far`)),
+    h('div', { className: 'loyal' }, Array.from({ length: every }, (_, i) => h('span', { key: i, className: i < n ? 'done' : i === every - 1 ? 'gift' : '' }, i === every - 1 && i >= n ? '🎁' : i + 1))),
+    h('span', { className: 'tiny muted' }, n === every - 1 ? 'One more game and the next one is free. The reminder for their next booking says so.' : `${every - n} more game${every - n === 1 ? '' : 's'} to a free game.`),
+    p.unredeemed > 0 && h('span', { className: 'pill pill-good', style: { alignSelf: 'flex-start' } }, 'Unused free-game voucher'));
+}
+function WhatsApp({ msg, time = '12:00' }) {
+  const parts = msg.text.split(/(\{\{[^}]+\}\})/g);
+  return h('div', { className: 'wa' },
+    h('div', { className: 'wa-head' }, h('span', { className: 'wa-av' }, 'N'), h('div', { style: { lineHeight: 1.2 } }, h('div', { style: { fontWeight: 600, fontSize: 13 } }, CLUB), h('div', { style: { fontSize: 11, opacity: .8 } }, 'Business account'))),
+    h('div', { className: 'wa-wall' },
+      h('div', { className: 'wa-bubble' },
+        h('div', { className: 'wa-text' }, parts.map((x, i) => x.startsWith('{{') ? h('span', { key: i, className: 'var' }, x.slice(2, -2)) : h(Frag, { key: i }, x))),
+        h('div', { className: 'wa-time nums' }, time),
+        msg.buttons.map(b => h('span', { key: b, className: 'wa-btn' }, b)))));
+}
+
+/* ---------- charts ---------- */
+function niceMax(v) { const p = Math.pow(10, Math.floor(Math.log10(v))); const n = v / p; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * p; }
+function BarChart({ data, height = 200, fmt = v => String(Math.round(v)), label, max: fixedMax }) {
+  const [hover, setHover] = useState(null);
+  const W = 640, H = height, L = 44, R = 8, T = 22, B = 26;
+  const max = fixedMax || niceMax(Math.max(1, ...data.map(d => d.value)) * 1.05);
+  const ticks = [0, .25, .5, .75, 1].map(f => f * max);
+  const bw = (W - L - R) / data.length;
+  const y = v => T + (H - T - B) * (1 - v / max);
+  return h('svg', { viewBox: `0 0 ${W} ${H}`, width: '100%', role: 'img', 'aria-label': label, style: { display: 'block' } },
+    ticks.map(t => h('g', { key: t }, h('line', { x1: L, x2: W - R, y1: y(t), y2: y(t), stroke: 'var(--line)' }), h('text', { x: L - 8, y: y(t) + 4, textAnchor: 'end', fontSize: 11, fill: 'var(--muted)' }, fmt(t)))),
+    data.map((d, i) => {
+      const x = L + i * bw + bw * .18, w = bw * .64;
+      if (d.closed) return h('g', { key: i },
+        h('rect', { x, y: T, width: w, height: H - T - B, rx: 3, fill: 'var(--sunken)' }),
+        h('text', { x: x + w / 2, y: T + (H - T - B) / 2, textAnchor: 'middle', fontSize: 10.5, fill: 'var(--muted)', transform: `rotate(-90 ${x + w / 2} ${T + (H - T - B) / 2})` }, 'Closed'),
+        h('text', { x: x + w / 2, y: H - 8, textAnchor: 'middle', fontSize: 10.5, fill: 'var(--muted)' }, d.label));
+      const top = y(d.value), hgt = Math.max(2, y(0) - top);
+      const split = d.part != null ? y(0) - Math.max(0, (y(0) - y(d.part))) : null;
+      return h('g', { key: i, onMouseEnter: () => setHover(i), onMouseLeave: () => setHover(null) },
+        h('rect', { x: L + i * bw, y: T, width: bw, height: H - T - B, fill: 'transparent' }),
+        h('rect', { x, y: top, width: w, height: hgt, rx: 3, fill: d.highlight ? 'var(--turf)' : d.tone ? `var(--${d.tone})` : 'color-mix(in oklab, var(--turf) 55%, var(--surface))' }),
+        split != null && h('rect', { x, y: split, width: w, height: y(0) - split, fill: 'var(--warn)' }),
+        h('text', { x: x + w / 2, y: H - 8, textAnchor: 'middle', fontSize: 10.5, fill: d.highlight ? 'var(--ink)' : 'var(--muted)', fontWeight: d.highlight ? 700 : 400 }, d.label),
+        hover === i && h('text', { className: 'chart-tip', x: clamp(x + w / 2, L + 30, W - 40), y: top - 8, textAnchor: 'middle' }, d.tip || fmt(d.value)));
+    }),
+    h('line', { x1: L, x2: W - R, y1: y(0), y2: y(0), stroke: 'var(--muted)' }));
+}
+
+/* =======================================================================
+   APP
+   ======================================================================= */
+const NAV = [['today', 'Today'], ['bookings', 'Bookings'], ['weekends', 'Weekend fill'], ['automations', 'WhatsApp automations'], ['players', 'Players & rewards'], ['memberships', 'Memberships'], ['season', 'Season']];
+const NAV_IDS = NAV.map(n => n[0]);
+function App() {
+  const [slots, setSlots] = useState(genSlots);
+  const [page, setPage] = useState(() => { try { const x = (window.location.hash || '').slice(1); return NAV_IDS.includes(x) ? x : 'today'; } catch (e) { return 'today'; } });
+  const [flowsOn, setFlowsOn] = useState(() => Object.fromEntries(FLOWS.map(f => [f.id, f.id !== 'reopen'])));
+  const [flowSel, setFlowSel] = useState('r24');
+  const [stageFilter, setStageFilter] = useState('all');
+  const [every, setEvery] = useState(REWARD_DEFAULT);
+  const [plays, setPlays] = useState({ americano: false, thursday: true, weekendClub: true, juniors: false, lastMinute: false });
+  const [sentLog, setSentLog] = useState([]);
+  const [toasts, setToasts] = useState([]);
+  const toast = text => { const id = Math.random().toString(36).slice(2); setToasts(t => [...t, { id, text }]); setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3600); };
+  const nav = p => { setPage(p); try { window.history.replaceState(null, '', '#' + p); } catch (e) {} try { window.scrollTo(0, 0); } catch (e) {} };
+  const ctx = { slots, setSlots, nav, toast, flowsOn, setFlowsOn, flowSel, setFlowSel, stageFilter, setStageFilter, every, setEvery, plays, setPlays, sentLog, setSentLog };
+  const Page = { today: TodayPage, bookings: BookingsPage, weekends: WeekendPage, automations: AutomationsPage, players: PlayersPage, memberships: MembershipsPage, season: SeasonPage }[page];
+  const weekendOpen = slots.filter(s => s.we && !s.booking && s.ts > NOW_MS).length;
+  return h('div', { className: 'shell' },
+    h('header', { className: 'topnav' }, h('div', { className: 'topnav-in' },
+      h('div', { className: 'club' }, h(Mark), h('div', null, h('div', { className: 'club-name' }, CLUB), h('div', { className: 'tiny muted', style: { marginTop: 3 } }, `${COURTS.length} courts · ${HOURS_PER_WEEK} h a week`))),
+      h('nav', { className: 'navlinks', 'aria-label': 'Sections' }, NAV.map(([id, label]) => h('button', { key: id, className: page === id ? 'on' : '', onClick: () => nav(id), 'aria-current': page === id ? 'page' : undefined }, label, id === 'weekends' && weekendOpen > 0 && h('span', { className: 'count' }, weekendOpen)))),
+      h('div', { className: 'who' }, h('span', { className: 'tag' }, 'Sample data'), h('span', { className: 'avatar sm', style: { background: 'var(--ink)' } }, 'N')))),
+    h('main', { className: 'main' }, h(Page, { ctx }),
+      h('footer', { className: 'foot' },
+        h('span', null, `Demo prepared for ${CLUB}. Everything here is sample data, not the club's real bookings, players or prices. Prices in £ including VAT. Runs on ${BRAND}.`),
+        h('span', null, `Prepared by ${CONTACT.name}, ${CONTACT.phones.join(' / ')}`))),
+    h('div', { className: 'toasts', 'aria-live': 'polite' }, toasts.map(t => h('div', { key: t.id, className: 'toast' }, h('span', { style: { color: 'var(--good)' } }, h(Icon, { name: 'check', size: 16 })), h('span', null, t.text)))));
+}
+
+/* =======================================================================
+   TODAY
+   ======================================================================= */
+function TodayPage({ ctx }) {
+  const { slots, nav, setStageFilter, every } = ctx;
+  const wd = slots.filter(s => !s.we), we = slots.filter(s => s.we);
+  const occ = list => list.filter(s => s.booking).length / Math.max(1, list.length);
+  const today = slots.filter(s => s.d === 0);
+  const tonight = today.filter(s => s.booking && s.ts > NOW_MS);
+  const weekendOpen = we.filter(s => !s.booking && s.ts > NOW_MS);
+  const monthlyDue = PLAYERS.filter(p => p.stage === 'monthly' && p.lastDays >= 21 && p.optIn);
+  const ready = PLAYERS.filter(p => (p.stage === 'weekly' || p.stage === 'fortnightly') && p.optIn);
+  const oneAway = PLAYERS.filter(p => rewardProgress(p, every) === every - 1);
+  const items = [
+    weekendOpen.length && { tone: 'warn', title: `Fill this weekend: ${weekendOpen.length} of ${we.length} court-hours still free`, body: `Weekday evenings are ${pct(occ(wd))} sold, the weekend only ${pct(occ(we))}. The Thursday weekend message goes out at 12:00; add a Saturday Americano to sell single spots.`, action: 'Open weekend fill', go: () => nav('weekends') },
+    monthlyDue.length && { tone: 'plum', title: `${monthlyDue.length} once-a-month players haven't played in 3 weeks`, body: 'Each gets a "play two weeks in a row, second game half price" message on WhatsApp, with this week\'s free courts.', action: 'See who', go: () => { setStageFilter('monthly'); nav('players'); } },
+    ready.length && { tone: 'good', title: `${ready.length} regulars play often enough to save on a membership`, body: 'They pay per game today. The savings nudge shows each one what NEXO Regular would have cost them last month.', action: 'See the message', go: () => { ctx.setFlowSel('ladder'); nav('automations'); } },
+    oneAway.length && { tone: 'gold', title: `${oneAway.length} players are one game away from a free game`, body: 'Their next reminder tells them the following game is on the club, which brings them back sooner.', action: 'See rewards', go: () => nav('players') },
+    daysToSeasonEnd <= 45 && { tone: 'crit', title: `The season ends in ${daysToSeasonEnd} days`, body: `Sell the ${reopen.getFullYear()} Season Pass at the early price before the club closes, so January's revenue comes in before you reopen.`, action: 'Plan the close', go: () => nav('season') }
+  ].filter(Boolean);
+  return h(Frag, null,
+    h('div', { className: 'topbar', style: { alignItems: 'flex-start' } },
+      h('div', { style: { flex: '1 1 520px', minWidth: 0 } },
+        h('h1', { className: 'hello' }, 'Afternoon, NEXO team.'),
+        h('p', { className: 'briefing' }, 'This week you\'ve sold ', h('b', null, `${slots.filter(s => s.booking).length} of ${slots.length}`), ' court-hours. Weekday evenings are ', h('b', null, pct(occ(wd)), ' full'), '; the weekend is only ', h('span', { className: 'w' }, pct(occ(we)), ' booked'), '. ', h('b', null, tonight.length, ' games'), ' tonight, and every player has had a reminder.')),
+      h('span', { className: 'muted small nums' }, `${DOW_LONG[NOW.getDay()]} ${NOW.getDate()} ${MON_LONG[NOW.getMonth()]}, 16:10`)),
+    h('div', { className: 'kpis' },
+      h(Kpi, { label: 'Weekday evenings sold', value: pct(occ(wd)), sub: 'Next 7 days' }),
+      h(Kpi, { label: 'Weekend sold', value: pct(occ(we)), sub: `${weekendOpen.length} court-hours still free`, tone: 'warn' }),
+      h(Kpi, { label: 'Members', value: String(PLAYERS.filter(p => p.plan).length), sub: `+7 this season from WhatsApp offers`, tone: 'good' }),
+      h(Kpi, { label: 'Late no-shows, last 30 days', value: '3', sub: 'Down from 19 before reminders' })),
+    h('div', { className: 'today-grid' },
+      h('section', null,
+        h('h2', { className: 'h2', style: { marginBottom: 4 } }, 'Worth doing today'),
+        items.map((it, i) => h('div', { key: i, className: 'todo' },
+          h('span', { className: 'mark', style: { background: `var(--${it.tone === 'gold' ? 'sand' : it.tone})` } }),
+          h('div', { style: { minWidth: 0 } }, h('div', { className: 'todo-title' }, it.title), h('div', { className: 'todo-body' }, it.body)),
+          h('div', { className: 'todo-actions' }, h('button', { className: 'btn', onClick: it.go }, it.action))))),
+      h('div', { className: 'stack', style: { gap: 22 } },
+        h(Card, { title: 'Tonight\'s games and reminders' },
+          tonight.length === 0 && h('p', { className: 'muted small' }, 'No more games today.'),
+          tonight.map(s => {
+            const r = reminderState(s);
+            return h('div', { key: s.id, className: 'list-row', style: { alignItems: 'flex-start' } },
+              h('span', { className: 'nums', style: { fontWeight: 700, width: 48 } }, hh(s.hr)),
+              h('div', { style: { flex: 1, minWidth: 0 } },
+                h('b', null, s.court.name), h('span', { className: 'tiny muted' }, ` · ${shortName(s.booking.players[0])} +3`),
+                h('div', { className: 'tiny muted' }, `24 h reminder ${r.r24.toLowerCase()} · 2 h reminder ${r.r2.toLowerCase()}`),
+                s.booking.dropout && h('div', { className: 'tiny t-good', style: { fontWeight: 600 } }, 'One player tapped Can\'t make it; the waitlist filled the spot in 14 minutes.')),
+              h('span', { className: `pill ${s.booking.confirmed === 4 ? 'pill-good' : 'pill-warn'}` }, `${s.booking.confirmed}/4 confirmed`));
+          })),
+        h(Card, { title: 'WhatsApp today' },
+          [['13:20', 'Reminders for tomorrow\'s 6 games', '19 of 24 players confirmed so far'], ['11:30', 'Membership offer to Olivia H.', 'Joined NEXO Regular'], ['10:00', 'Welcome to 3 first-time players', '1 booked game 2'], ['09:15', '"One more game" to Leo S.', 'Booked Thu 19:00']].map(([t, a, b]) =>
+            h('div', { key: a, className: 'feed-item' }, h('time', { className: 'nums' }, t), h('div', null, h('b', null, a), h('div', { className: 'tiny muted' }, b))))))));
+}
+
+/* =======================================================================
+   BOOKINGS
+   ======================================================================= */
+function BookingsPage({ ctx }) {
+  const { slots, setSlots, toast } = ctx;
+  const [openId, setOpenId] = useState(null);
+  const open = openId ? slots.find(s => s.id === openId) : null;
+  return h(Frag, null,
+    h(PageHead, { title: 'Bookings', sub: `The next 7 days at ${CLUB}, only the ${HOURS_PER_WEEK} hours a week the club is open. Every booking gets two WhatsApp reminders.` },
+      h('span', { className: 'chip' }, h('span', { className: 'dot' }), 'Playtomic · 3 min ago'), h('span', { className: 'chip' }, h('span', { className: 'dot' }), 'WhatsApp · live')),
+    h(Card, null, h('div', { className: 'stack' },
+      h(WeekGrid, { slots, onOpen: s => setOpenId(s.id), selected: openId }),
+      h('div', { className: 'legend' },
+        h('span', null, h('i', { style: { background: 'var(--sunken)', borderColor: 'transparent' } }), 'Booked'),
+        h('span', null, h('i', { style: { background: 'var(--good-soft)', borderColor: 'var(--good)' } }), 'Filled by a WhatsApp offer'),
+        h('span', null, h('i', null), 'Free, weekday'),
+        h('span', null, h('i', { style: { borderColor: 'var(--warn)', borderStyle: 'dashed' } }), 'Free, weekend'),
+        h('span', null, '✓ = players confirmed from the reminder')))),
+    h(Drawer, { open: !!open, onClose: () => setOpenId(null), eyebrow: open ? `${dayWord(open.d)} · ${slotText(open.hr)}` : '', title: open ? open.court.name : '' },
+      open && (open.booking ? h(BookingDetail, { s: open }) : h(Frag, null,
+        h('div', null, h('div', { className: 'tiny muted' }, 'Court price'), h('div', { className: 'price-big nums' }, gbp(open.base)), h('div', { className: 'tiny muted' }, `${gbp(open.base / 4)} each for four players · same price every day`)),
+        open.we && h('p', { className: 'small' }, 'This weekend court is in Thursday\'s WhatsApp offer. Weekend Club members see it at half price.'),
+        h('button', { className: 'btn btn-primary btn-lg', onClick: () => {
+          const pl = PLAYERS.filter(p => p.stage !== 'lapsed').slice(3, 7).map(p => p.id);
+          setSlots(ss => ss.map(x => x.id === open.id ? { ...x, booking: { source: 'Front desk', players: pl, price: open.base, free: 0, confirmed: 0, dropout: false } } : x));
+          toast(`Booked ${open.court.name}, ${dayWord(open.d)} ${hh(open.hr)}. Reminders scheduled for all four players.`);
+          setOpenId(null);
+        } }, `Book at ${gbp(open.base)}`)))));
+}
+function WeekGrid({ slots, onOpen, selected, picked }) {
+  const days = DAYS.map((_, d) => d);
+  const hours = [...new Set(Object.values(HOURS).flat())].sort((a, b) => a - b);
+  return h('div', { className: 'scroll-x' },
+    h('div', { className: 'cgrid', style: { gridTemplateColumns: `62px repeat(${days.length}, minmax(96px, 1fr))`, minWidth: 780 } },
+      h('div'),
+      days.map(d => {
+        const ds = slots.filter(s => s.d === d);
+        const sold = ds.filter(s => s.booking).length;
+        const we = isWeekend(DAYS[d].getDay());
+        return h('div', { key: d, className: 'hcell' },
+          h('div', { className: 'h3' }, dayWord(d)),
+          h('div', { className: `tiny ${we ? 't-warn' : 'muted'}`, style: { fontWeight: we ? 600 : 400 } }, `${DAYS[d].getDate()} ${MON[DAYS[d].getMonth()]} · ${sold}/${ds.length} sold`));
+      }),
+      hours.map(hr => h(Frag, { key: hr },
+        h('div', { className: 'time nums' }, hh(hr)),
+        days.map(d => {
+          const here = slots.filter(s => s.d === d && s.hr === hr);
+          if (!here.length) return h('div', { key: d, className: 'cell closed', 'aria-hidden': 'true' }, h('span', { className: 'tiny', style: { color: 'var(--line)' } }, 'Closed'));
+          return h('div', { key: d, style: { display: 'grid', gap: 3 } }, here.map(s => h(Cell, { key: s.id, s, onOpen, sel: selected === s.id || (picked && picked.has(s.id)) })));
+        })))));
+}
+function Cell({ s, onOpen, sel }) {
+  const b = s.booking;
+  const past = s.ts + 36e5 <= NOW_MS;
+  let cls = 'cell', top, bottom;
+  if (b) {
+    cls += b.source === 'Weekend offer' ? ' campaign' : ' booked';
+    top = h('span', { className: 'src' }, `${s.court.name.replace('Court ', 'C')} · ${b.source}`);
+    bottom = h('span', null, shortName(b.players[0]), s.ts > NOW_MS && reminderState(s).r24sent ? ` · ${b.confirmed}✓` : '', b.free ? ' · 🎁' : '');
+  } else {
+    if (s.we && !past) cls += ' weekend-open';
+    top = h('span', { className: s.we ? 't-warn' : 'muted', style: { fontWeight: 600 } }, `${s.court.name.replace('Court ', 'C')} · ${past ? 'Unsold' : 'Free'}`);
+    bottom = h('span', { className: 'nums' }, gbp(s.base));
+  }
+  if (sel) cls += ' sel';
+  return h('button', { className: cls, style: { minHeight: 44, opacity: past && !b ? .5 : 1 }, onClick: () => onOpen(s), 'aria-label': `${s.court.name} ${dayWord(s.d)} ${slotText(s.hr)}: ${b ? 'booked' : 'free'}` }, top, bottom);
+}
+function BookingDetail({ s }) {
+  const b = s.booking;
+  const r = reminderState(s);
+  const past = s.ts + 36e5 <= NOW_MS;
+  return h(Frag, null,
+    h('div', { className: 'row' }, h('span', { className: 'pill pill-muted' }, b.source), b.free > 0 && h('span', { className: 'pill pill-gold' }, '🎁 Includes a free reward game')),
+    h('dl', { className: 'kv' }, h('dt', null, 'Court price'), h('dd', { className: 'nums' }, `${gbp(b.price)} · ${gbp(b.price / 4)} each`), b.free > 0 && h(Frag, null, h('dt', null, 'Reward'), h('dd', null, `${shortName(b.players[0])}'s share is free; the other three pay as usual`))),
+    h('div', null, h('div', { className: 'eyebrow', style: { marginBottom: 4 } }, 'Players'),
+      b.players.map((id, i) => { const p = PMAP.get(id); return h('div', { key: id, className: 'list-row' }, h(Avatar, { id }), h('div', { style: { flex: 1, minWidth: 0 } }, h('b', null, p.name), h('div', { className: 'tiny muted' }, p.plan ? PLAN_MAP[p.plan].name : SMAP[p.stage].name)), h(MiniLoyal, { p, every: REWARD_DEFAULT })); })),
+    !past && h('div', null, h('div', { className: 'eyebrow', style: { marginBottom: 8 } }, 'Reminders'),
+      h('div', { className: 'timeline' },
+        h('div', { className: 'tl' }, h('span', { className: 't' }, 'Booked'), h('span', { className: 'rail done' }), h('div', { className: 'b' }, 'Confirmation sent on WhatsApp')),
+        h('div', { className: 'tl' }, h('span', { className: 't' }, '24 h before'), h('span', { className: `rail ${r.r24sent ? 'done' : ''}` }), h('div', { className: 'b' }, r.r24sent ? `Sent. ${b.confirmed} of 4 tapped I'm in.` : r.r24, b.dropout && h('div', { className: 'tiny t-good' }, 'One player tapped Can\'t make it. The spot went to the waitlist and was filled.'))),
+        h('div', { className: 'tl' }, h('span', { className: 't' }, '2 h before'), h('span', { className: `rail ${r.r2sent ? 'done' : ''}` }), h('div', { className: 'b' }, r.r2sent ? 'Sent with directions and racket hire.' : r.r2)),
+        h('div', { className: 'tl' }, h('span', { className: 't' }, 'After'), h('span', { className: 'rail' }), h('div', { className: 'b' }, 'Each player\'s free-game card moves up by one.')))),
+    !past && h(WhatsApp, { msg: FLOWS[0].msg(), time: '18:00' }));
+}
+
+/* =======================================================================
+   WEEKEND FILL
+   ======================================================================= */
+const SEGMENTS = [
+  { id: 'weekday', name: 'Weekday regulars who rarely play weekends', rule: 'Played 5+ weekday games in 90 days, 0–1 weekend games', size: () => PLAYERS.filter(p => p.g90 >= 5 && p.weekendGames <= 1 && p.optIn).length, rate: .09 },
+  { id: 'monthly', name: 'Once-a-month players', rule: '2–4 games in 90 days', size: () => PLAYERS.filter(p => p.stage === 'monthly' && p.optIn).length, rate: .07 },
+  { id: 'weekendclub', name: 'Weekend Club members', rule: 'Half-price weekend courts', size: () => PLAYERS.filter(p => p.plan === 'weekend').length, rate: .4 },
+  { id: 'new', name: 'New players', rule: 'One game so far', size: () => PLAYERS.filter(p => p.stage === 'new' && p.optIn).length, rate: .08 },
+  { id: 'lapsed', name: 'Lapsed players', rule: 'No game in 45 days', size: () => PLAYERS.filter(p => p.stage === 'lapsed' && p.optIn).length, rate: .05 }
+];
+const WEEKEND_PLAYS = [
+  { id: 'americano', name: 'Saturday Americano, 10:00–12:00', fills: 4, body: 'Sell 8 single spots at £4 instead of whole courts. Players who can\'t get a four together just turn up. Both courts, two hours.' },
+  { id: 'thursday', name: 'Thursday WhatsApp: weekend courts', fills: 2, body: 'At 12:00 every Thursday, free weekend courts go to weekday regulars who rarely play weekends.' },
+  { id: 'weekendClub', name: 'Weekend Club membership, £5 a month', fills: 3, body: 'Half-price weekend courts plus free Americano entry. Members book weekends because they already paid for them.' },
+  { id: 'juniors', name: 'Sunday juniors and family hour, 11:00', fills: 2, body: 'A coached hour for kids and parents. Families are free on Sunday mornings when adults\' groups are not.' },
+  { id: 'lastMinute', name: 'Friday 20:00 last-minute price', fills: 1, body: 'Weekend courts still free on Friday evening drop to £10 (£2.50 each) and go to the "Find me a game" list.' }
+];
+function WeekendPage({ ctx }) {
+  const { slots, setSlots, plays, setPlays, toast } = ctx;
+  const [sel, setSel] = useState(() => new Set());
+  const [seg, setSeg] = useState('weekday');
+  const [result, setResult] = useState(null);
+  const wd = slots.filter(s => !s.we), we = slots.filter(s => s.we);
+  const occ = list => list.filter(s => s.booking).length / Math.max(1, list.length);
+  const open = we.filter(s => !s.booking && s.ts > NOW_MS);
+  const segment = SEGMENTS.find(x => x.id === seg);
+  const selSlots = open.filter(s => sel.has(s.id));
+  const hourly = [...new Set(Object.values(HOURS).flat())].sort((a, b) => a - b);
+  const chart = [1, 2, 3, 4, 5, 6, 0].map(dow => {
+    const list = slots.filter(s => s.dow === dow);
+    return { label: DOW[dow], value: occ(list) * 100, tip: pct(occ(list)) + ' sold', tone: isWeekend(dow) ? 'warn' : null };
+  });
+  const lines = selSlots.slice(0, 4).map(s => `• ${DOW[s.dow]} ${slotText(s.hr)} · ${s.court.name} · £${s.base} a court`).join('\n') || '• (pick weekend courts on the left)';
+  const msg = { text: `Weekend courts at ${CLUB}, {{Sam}}:\n${lines}\n\nWeekend Club members play half price. Tap to book and pay by card.`, buttons: ['Book a weekend court', 'Join Weekend Club', 'Stop offers'] };
+  const filledHours = sum(WEEKEND_PLAYS.filter(p => plays[p.id]), p => p.fills);
+  function send() {
+    if (!selSlots.length) return;
+    const size = segment.size();
+    const rnd = mulberry32(size * 31 + selSlots.length);
+    const read = Math.round(size * (.78 + rnd() * .1));
+    const booked = Math.max(1, Math.min(selSlots.length, Math.round(size * segment.rate * (1 + rnd()))));
+    const filled = new Set(selSlots.slice(0, booked).map(s => s.id));
+    const pool = PLAYERS.filter(p => p.optIn && p.stage !== 'lapsed');
+    setSlots(ss => ss.map(s => filled.has(s.id) ? { ...s, booking: { source: 'Weekend offer', players: (() => { const set = new Set(); while (set.size < 4) set.add(pool[Math.floor(rnd() * pool.length)].id); return [...set]; })(), price: s.base, free: 0, confirmed: 0, dropout: false } } : s));
+    setResult({ sent: size, read, tapped: Math.round(read * segment.rate * 2.2), booked, revenue: sum(selSlots.slice(0, booked), s => s.base) });
+    setSel(new Set());
+    toast(`${booked} weekend court-hour${booked > 1 ? 's' : ''} booked from the WhatsApp offer.`);
+  }
+  return h(Frag, null,
+    h(PageHead, { title: 'Weekend fill', sub: 'Weekday evenings sell themselves. Weekends don\'t. These are the levers that move weekend players, and the WhatsApp offer that sends them.' }),
+    h('div', { className: 'kpis' },
+      h(Kpi, { label: 'Weekday evenings sold', value: pct(occ(wd)), sub: 'Next 7 days' }),
+      h(Kpi, { label: 'Weekend sold', value: pct(occ(we)), sub: `${we.filter(s => s.booking).length} of ${we.length} court-hours`, tone: 'warn' }),
+      h(Kpi, { label: 'Free weekend court-hours', value: String(open.length), sub: `${gbp(sum(open, s => s.base))} at full price` }),
+      h(Kpi, { label: 'Levers switched on', value: `${WEEKEND_PLAYS.filter(p => plays[p.id]).length} of ${WEEKEND_PLAYS.length}`, sub: `Could fill about ${filledHours} court-hours a weekend (estimate)`, tone: 'good' })),
+    h('div', { className: 'grid-2' },
+      h(Card, { title: 'Share of courts sold, by day', right: h('span', { className: 'tiny muted' }, 'Next 7 days') },
+        h(BarChart, { data: chart, max: 100, fmt: v => Math.round(v) + '%', label: 'Share of courts sold by day of week' }),
+        h('p', { className: 'small', style: { marginTop: 8 } }, 'The gap is the opportunity: the club has 4 weekend hours on 2 courts, 8 court-hours a weekend. Selling half of what is empty adds roughly ', h('b', null, gbp(open.length / 2 * PRICE.weekend * 4.3)), ' a month.')),
+      h('div', { className: 'stack' }, WEEKEND_PLAYS.map(p => h('div', { key: p.id, className: `play ${plays[p.id] ? 'on' : ''}` },
+        h('div', { className: 'spread' }, h('b', null, p.name), h(Switch, { on: plays[p.id], label: p.name, onChange: v => { setPlays(x => ({ ...x, [p.id]: v })); toast(`${p.name}: ${v ? 'on' : 'off'}.`); } })),
+        h('span', { className: 'small muted' }, p.body),
+        h('span', { className: 'tiny' }, h('b', null, `~${p.fills} court-hours`), h('span', { className: 'muted' }, ' a weekend, estimate')))))),
+    h('div', { className: 'grid-2' },
+      h(Card, { eyebrow: 'Step 1', title: 'Pick the weekend courts to offer', right: h('button', { className: 'btn', onClick: () => setSel(new Set(open.map(s => s.id))) }, 'All free weekend courts') },
+        open.length === 0 && h('p', { className: 'muted small' }, 'Every weekend court is booked. Nice.'),
+        [6, 0].map(dow => {
+          const list = open.filter(s => s.dow === dow);
+          if (!list.length) return null;
+          return h('div', { key: dow, style: { marginBottom: 12 } },
+            h('div', { className: 'eyebrow', style: { marginBottom: 6 } }, `${DOW_LONG[dow]} ${DAYS[list[0].d].getDate()} ${MON[DAYS[list[0].d].getMonth()]}`),
+            h('div', { className: 'row', style: { gap: 6 } }, list.map(s => {
+              const on = sel.has(s.id);
+              return h('button', { key: s.id, className: 'btn', 'aria-pressed': on, style: { borderColor: on ? 'var(--turf)' : 'var(--warn)', background: on ? 'var(--turf)' : undefined, color: on ? 'var(--surface)' : undefined },
+                onClick: () => setSel(x => { const n = new Set(x); n.has(s.id) ? n.delete(s.id) : n.add(s.id); return n; }) }, `${hh(s.hr)} · ${s.court.name} · £${s.base}`);
+            })));
+        })),
+      h(Card, { eyebrow: 'Step 2', title: 'Who gets the message' },
+        h('div', { className: 'stack' },
+          h('div', { className: 'field' }, h('label', { htmlFor: 'seg' }, 'Send to'),
+            h('select', { id: 'seg', className: 'input', value: seg, onChange: e => setSeg(e.target.value) }, SEGMENTS.map(x => h('option', { key: x.id, value: x.id }, `${x.name} (${x.size()})${x.id === 'weekday' ? ' · recommended' : ''}`))),
+            h('span', { className: 'tiny muted' }, `${segment.rule}. All opted in to WhatsApp offers.`)),
+          h(WhatsApp, { msg }),
+          result && h('div', { className: 'card', style: { padding: 12, background: 'var(--paper)' } },
+            h('b', { className: 'small' }, 'Simulated result'),
+            h('div', { className: 'kpis k3', style: { marginTop: 6 } }, h(Kpi, { label: 'Read', value: `${result.read}/${result.sent}` }), h(Kpi, { label: 'Tapped Book', value: String(result.tapped) }), h(Kpi, { label: 'Court-hours booked', value: String(result.booked), sub: gbp(result.revenue), tone: 'good' }))),
+          h('button', { className: 'btn btn-primary btn-lg', disabled: !selSlots.length, onClick: send }, selSlots.length ? `Send to ${segment.size()} players` : 'Pick weekend courts first'),
+          h('span', { className: 'tiny muted', style: { marginTop: -6 } }, 'Simulated send. Approved template weekend_courts_en, category Marketing.')))));
+}
+
+/* =======================================================================
+   AUTOMATIONS
+   ======================================================================= */
+function AutomationsPage({ ctx }) {
+  const { flowsOn, setFlowsOn, flowSel, setFlowSel, toast } = ctx;
+  const f = FLOWS.find(x => x.id === flowSel) || FLOWS[0];
+  const groups = [...new Set(FLOWS.map(x => x.group))];
+  const onCount = FLOWS.filter(x => flowsOn[x.id]).length;
+  return h(Frag, null,
+    h(PageHead, { title: 'WhatsApp automations', sub: 'Messages that go out on their own from NEXO\'s WhatsApp number: reminders before every game, a membership offer at the right moment, and a nudge for players who drift.' },
+      h('span', { className: 'chip' }, h('span', { className: 'dot' }), `${onCount} of ${FLOWS.length} running`)),
+    h('div', { className: 'kpis' },
+      h(Kpi, { label: 'Messages sent, last 30 days', value: String(sum(FLOWS, x => x.stats.sent)), sub: 'All templates approved by WhatsApp' }),
+      h(Kpi, { label: 'Memberships from WhatsApp', value: '7', sub: 'This season', tone: 'good' }),
+      h(Kpi, { label: 'Players confirming from the reminder', value: '87%', sub: 'Tap I\'m in within 6 hours' }),
+      h(Kpi, { label: 'Opted out of offers', value: '2.1%', sub: 'Reminders still go to them' })),
+    h(Card, { title: 'How a player moves up', right: h('span', { className: 'tiny muted' }, 'Each arrow is an automation') },
+      h('div', { className: 'row', style: { gap: 8, alignItems: 'stretch' } },
+        [['First game', 'Welcome, half-price game 2', 'welcome'], ['Plays once a month', 'Nudge after 21 days', 'monthly'], ['3 games in 30 days', 'Membership offer', 'repeat'], ['Plays weekly, no plan', 'Monthly savings nudge', 'ladder'], ['Member', 'Weekend courts, rewards', 'weekend']].map(([a, b, id], i, arr) => h(Frag, { key: id },
+          h('button', { className: 'card', style: { flex: '1 1 150px', textAlign: 'left', padding: '12px 14px', borderColor: flowSel === id ? 'var(--ink)' : undefined }, onClick: () => setFlowSel(id) },
+            h('div', { className: 'h3' }, a), h('div', { className: 'tiny muted' }, b)),
+          i < arr.length - 1 && h('span', { className: 'muted', style: { alignSelf: 'center' }, 'aria-hidden': 'true' }, '→'))))),
+    h('div', { className: 'grid-2' },
+      h(Card, { title: 'Automations', style: { padding: '10px 10px 6px' } },
+        groups.map(g => h('div', { key: g, style: { marginBottom: 6 } },
+          h('div', { className: 'eyebrow', style: { padding: '6px 10px 2px' } }, g),
+          FLOWS.filter(x => x.group === g).map(x => h('button', { key: x.id, className: `flow ${flowSel === x.id ? 'on' : ''}`, onClick: () => setFlowSel(x.id) },
+            h('span', { className: 'ico' }, h(Icon, { name: x.icon, size: 17 })),
+            h('div', { style: { minWidth: 0 } }, h('b', null, x.name), h('div', { className: 'tiny muted' }, x.trigger)),
+            h('div', { className: 'row', style: { flexWrap: 'nowrap', gap: 12 } },
+              h('div', { style: { textAlign: 'right' } }, h('b', { className: 'nums' }, x.stats.outcome), h('div', { className: 'tiny muted', style: { whiteSpace: 'nowrap' } }, x.outcomeLabel)),
+              h(Switch, { on: flowsOn[x.id], label: x.name, onChange: v => { setFlowsOn(o => ({ ...o, [x.id]: v })); toast(`${x.name}: ${v ? 'on' : 'paused'}.`); } }))))))),
+      h('div', { className: 'stack' },
+        h(Card, { eyebrow: f.group, title: f.name, right: h('span', { className: `pill ${flowsOn[f.id] ? 'pill-good' : 'pill-muted'}` }, flowsOn[f.id] ? 'Running' : 'Paused') },
+          h('dl', { className: 'kv', style: { marginBottom: 14 } },
+            h('dt', null, 'When'), h('dd', null, f.trigger),
+            h('dt', null, 'Who'), h('dd', null, f.audience),
+            h('dt', null, 'Last 30 days'), h('dd', null, `${f.stats.sent} sent · ${f.stats.outcome} ${f.outcomeLabel.toLowerCase()}${f.stats.note ? ` (${f.stats.note})` : ''}`)),
+          h(WhatsApp, { msg: f.msg() }),
+          h('p', { className: 'tiny muted', style: { marginTop: 8 } }, 'Highlighted words are filled in per player. Buttons book, confirm or release the court straight from WhatsApp.')),
+        h('button', { className: 'btn', style: { alignSelf: 'flex-start' }, onClick: () => toast(`Test message "${f.name}" sent to the NEXO front-desk phone.`) }, 'Send me a test'))));
+}
+
+/* =======================================================================
+   PLAYERS & REWARDS
+   ======================================================================= */
+function PlayersPage({ ctx }) {
+  const { stageFilter, setStageFilter, every, setEvery, toast } = ctx;
+  const [q, setQ] = useState('');
+  const [openId, setOpenId] = useState(null);
+  const [all, setAll] = useState(false);
+  const counts = Object.fromEntries(STAGES.map(s => [s.id, PLAYERS.filter(p => p.stage === s.id).length]));
+  const list = PLAYERS.filter(p => (stageFilter === 'all' || (stageFilter === 'reward' ? rewardProgress(p, every) >= every - 2 : p.stage === stageFilter)) && (!q || p.name.toLowerCase().includes(q.toLowerCase())))
+    .sort((a, b) => stageFilter === 'reward' ? rewardProgress(b, every) - rewardProgress(a, every) : b.g90 - a.g90);
+  const p = openId ? PMAP.get(openId) : null;
+  const oneAway = PLAYERS.filter(x => rewardProgress(x, every) === every - 1).length;
+  const earnedAll = sum(PLAYERS, x => earned(x, every));
+  return h(Frag, null,
+    h(PageHead, { title: 'Players & rewards', sub: 'Every player sorted by how often they play, so each one gets the message that moves them one step up, from once a month to a regular to a member.' }),
+    h('div', { className: 'ladder', role: 'tablist', 'aria-label': 'Player stages' },
+      STAGES.map((s, i) => h('button', { key: s.id, role: 'tab', 'aria-selected': stageFilter === s.id, className: `rung ${stageFilter === s.id ? 'on' : ''}`, onClick: () => setStageFilter(stageFilter === s.id ? 'all' : s.id) },
+        h('div', { className: 'small', style: { fontWeight: 600 } }, s.name),
+        h('div', { className: `n t-${s.tone === 'gold' ? 'gold' : s.tone}` }, counts[s.id]),
+        h('div', { className: 'tiny muted' }, s.sub),
+        i < 4 && h('span', { className: 'arrow', 'aria-hidden': 'true' }, '›')))),
+    h('div', { className: 'grid-2' },
+      h(Card, null, h('div', { className: 'stack' },
+        h('div', { className: 'spread' },
+          h(Seg, { value: ['all', 'reward'].includes(stageFilter) ? stageFilter : 'stage', onChange: v => setStageFilter(v === 'stage' ? 'monthly' : v), label: 'Filter', options: [['all', 'All players'], ['stage', ['all', 'reward'].includes(stageFilter) ? 'By stage' : SMAP[stageFilter].name], ['reward', 'Close to a free game']] }),
+          h('input', { className: 'input', placeholder: 'Search players', value: q, onChange: e => setQ(e.target.value), 'aria-label': 'Search players', style: { maxWidth: 220 } })),
+        h('div', { className: 'scroll-x' }, h('table', { className: 'tbl', style: { minWidth: 640 } },
+          h('thead', null, h('tr', null, ['Player', 'Stage', 'Games, 90 days', 'Last game', 'Free-game card', 'Next WhatsApp'].map((x, i) => h('th', { key: x, className: i === 2 || i === 3 ? 'r' : '' }, x)))),
+          h('tbody', null, (all ? list : list.slice(0, 15)).map(x => h('tr', { key: x.id, className: 'click', onClick: () => setOpenId(x.id) },
+            h('td', null, h('div', { className: 'row', style: { flexWrap: 'nowrap' } }, h(Avatar, { id: x.id, sm: true }), h('b', null, x.name))),
+            h('td', null, x.plan ? h('span', { className: 'pill pill-good' }, PLAN_MAP[x.plan].name) : h(StagePill, { stage: x.stage })),
+            h('td', { className: 'r' }, x.g90),
+            h('td', { className: 'r' }, x.lastDays === 0 ? 'Today' : `${x.lastDays} days ago`),
+            h('td', null, h(MiniLoyal, { p: x, every })),
+            h('td', { className: 'small muted', style: { maxWidth: 220 } }, nextMessage(x, every))))))),
+        list.length > 15 && h('button', { className: 'btn', style: { alignSelf: 'center' }, onClick: () => setAll(a => !a) }, all ? 'Show fewer' : `Show all ${list.length}`))),
+      h('div', { className: 'stack' },
+        h(Card, { title: 'Free game after every 10 games' },
+          h('div', { className: 'kpis k3', style: { marginBottom: 14 } },
+            h(Kpi, { label: 'Free games earned', value: String(earnedAll), sub: 'All time' }),
+            h(Kpi, { label: 'One game away', value: String(oneAway), tone: 'gold' }),
+            h(Kpi, { label: 'Cost to the club', value: gbp(earnedAll * SHARE), sub: 'One player\'s share each, all time' })),
+          h('div', { className: 'field' },
+            h('div', { className: 'spread small' }, h('label', { htmlFor: 'ev' }, 'Games for one free game'), h('b', { className: 'nums' }, every)),
+            h('input', { id: 'ev', type: 'range', min: 5, max: 15, step: 1, value: every, onChange: e => setEvery(Number(e.target.value)) })),
+          h('ul', { className: 'small', style: { margin: '12px 0 0', paddingLeft: 18, display: 'grid', gap: 6 } },
+            h('li', null, 'A free game covers the player\'s own share, so the court still earns from the other three.'),
+            h('li', null, 'Every booking counts, Playtomic and WhatsApp alike, matched on phone number.'),
+            h('li', null, 'After game 9, the next reminder says "this one unlocks a free game". After game 10, the voucher arrives on WhatsApp.'),
+            h('li', null, 'Free games can be used on weekends at no limit, which also helps fill them.'))))),
+    h(Drawer, { open: !!p, onClose: () => setOpenId(null), eyebrow: p ? `${p.phone} · came via ${p.source}` : '', title: p ? p.name : '' },
+      p && h(Frag, null,
+        h('div', { className: 'row', style: { gap: 10 } }, p.plan ? h('span', { className: 'pill pill-good' }, PLAN_MAP[p.plan].name) : h(StagePill, { stage: p.stage }), !p.optIn && h('span', { className: 'pill pill-muted' }, 'Reminders only, no offers')),
+        h('dl', { className: 'kv' },
+          h('dt', null, 'Games, all time'), h('dd', null, p.total),
+          h('dt', null, 'Games, 90 days'), h('dd', null, p.g90),
+          h('dt', null, 'Weekend games'), h('dd', null, p.weekendGames),
+          h('dt', null, 'Spent, 90 days'), h('dd', { className: 'nums' }, gbp(p.spend90)),
+          h('dt', null, 'Last game'), h('dd', null, p.lastDays === 0 ? 'Today' : `${p.lastDays} days ago`)),
+        h(LoyaltyCard, { p, every }),
+        h('div', null, h('div', { className: 'eyebrow', style: { marginBottom: 4 } }, 'Next automatic message'), h('div', { className: 'small' }, nextMessage(p, every))),
+        !p.plan && p.optIn && h(Frag, null,
+          h(WhatsApp, { msg: { text: `Hi ${p.first}, you've played ${p.g90} games at ${CLUB} in the last 3 months.\nNEXO Regular is £12 a month with four games included and booking 14 days ahead. Join this week and your first month is half price.`, buttons: ['Join NEXO Regular', 'Not now'] } }),
+          h('button', { className: 'btn btn-primary', onClick: () => { toast(`Membership offer sent to ${p.first} on WhatsApp.`); setOpenId(null); } }, 'Send membership offer now')))));
+}
+
+/* =======================================================================
+   MEMBERSHIPS
+   ======================================================================= */
+function MembershipsPage({ ctx }) {
+  const { toast } = ctx;
+  const members = PLAYERS.filter(p => p.plan);
+  const count = id => members.filter(p => p.plan === id).length;
+  const monthly = count('regular') * 12 + count('weekend') * 5 + count('season') * 9.9;
+  const [games, setGames] = useState(2);
+  const payg = games * PRICE.weekday / 4;
+  return h(Frag, null,
+    h(PageHead, { title: 'Memberships', sub: 'Plans sized for a club that is open 20 hours a week and 10 months a year. Members are billed only in the months NEXO is open.' }),
+    h('div', { className: 'kpis' },
+      h(Kpi, { label: 'Members', value: String(members.length), sub: `${count('regular')} Regular · ${count('weekend')} Weekend Club · ${count('season')} Season Pass` }),
+      h(Kpi, { label: 'Membership revenue a month', value: gbp(monthly), sub: 'In open months', tone: 'good' }),
+      h(Kpi, { label: 'Ready to convert', value: String(PLAYERS.filter(p => p.stage === 'weekly' || p.stage === 'fortnightly').length), sub: 'Play every 1–2 weeks, no plan' }),
+      h(Kpi, { label: 'Paused in Dec and Jan', value: String(count('regular') + count('weekend')), sub: 'Billing restarts 1 February' })),
+    h('div', { className: 'grid-3' }, PLANS.map(p => h('div', { key: p.id, className: `plan ${p.feature ? 'feature' : ''}` },
+      h('div', { className: 'spread' }, h('b', { className: 'h3' }, p.name), p.feature && h('span', { className: 'pill pill-gold' }, 'Main offer')),
+      h('div', null, h('span', { className: 'price-big nums', style: { fontSize: 28 } }, gbp(p.price)), h('span', { className: 'tiny muted' }, ` / ${p.per}`)),
+      h('p', { className: 'small muted' }, p.desc),
+      p.note && h('span', { className: 'pill pill-accent', style: { alignSelf: 'flex-start' } }, p.note),
+      h('div', { className: 'tiny muted', style: { marginTop: 'auto' } }, h('b', { className: 'nums', style: { color: 'var(--ink)' } }, count(p.id)), ' members')))),
+    h('div', { className: 'grid-2e' },
+      h(Card, { title: 'When does Regular pay off for a player?' },
+        h('div', { className: 'field' },
+          h('div', { className: 'spread small' }, h('label', { htmlFor: 'gm' }, 'Games a month'), h('b', { className: 'nums' }, games)),
+          h('input', { id: 'gm', type: 'range', min: 1, max: 8, step: 1, value: games, onChange: e => setGames(Number(e.target.value)) })),
+        h('table', { className: 'steps', style: { marginTop: 10 } }, h('tbody', null,
+          h('tr', null, h('td', { className: 'muted' }, `Pay as you go (${gbp(PRICE.weekday / 4)} a game)`), h('td', null, gbp(payg))),
+          h('tr', null, h('td', { className: 'muted' }, 'NEXO Regular'), h('td', null, gbp(12 + Math.max(0, games - 4) * SHARE * .9))),
+          (() => { const diff = payg - (12 + Math.max(0, games - 4) * SHARE * .9); return h('tr', null, h('td', null, h('b', null, diff >= 0 ? 'Player saves' : 'Regular costs more by')), h('td', null, h('b', { className: diff >= 0 ? 't-good' : 't-warn' }, gbp(Math.abs(diff))))); })())),
+        h('p', { className: 'small muted', style: { marginTop: 10 } }, games < 4 ? 'Below four games a month the player is better off paying per game. That is who the once-a-month nudge is for: get them to three or four games first, then offer the plan.' : 'From four games a month the plan pays for itself. The membership offer goes out on the third game in 30 days, when the saving is easy to show.')),
+      h(Card, { title: 'Membership offers, last 30 days' },
+        h('div', { className: 'scroll-x' }, h('table', { className: 'tbl' },
+          h('thead', null, h('tr', null, h('th', null, 'Automation'), h('th', { className: 'r' }, 'Sent'), h('th', { className: 'r' }, 'Joined'))),
+          h('tbody', null, [['Repeat player: membership offer', 23, 6], ['Regular, no plan: savings nudge', 28, 5], ['New player: welcome', 41, 1], ['Thursday weekend courts', 164, 2]].map(([a, b, c]) => h('tr', { key: a }, h('td', null, a), h('td', { className: 'r' }, b), h('td', { className: 'r t-good' }, h('b', null, c))))))),
+        h('button', { className: 'btn', style: { marginTop: 12 }, onClick: () => ctx.nav('automations') }, 'Open the automations'))));
+}
+
+/* =======================================================================
+   SEASON
+   ======================================================================= */
+function SeasonPage({ ctx }) {
+  const { toast, flowsOn, setFlowsOn } = ctx;
+  const capMonth = HOURS_PER_WEEK * COURTS.length * 4.33;
+  const BOOKED = [96, 112, 128, 134, 139, 118, 109, 131, 140, 133]; // sample court-hours sold, Feb–Nov
+  const WEEKEND = [9, 11, 14, 16, 18, 13, 10, 12, 11, 10];
+  const data = MON.map((m, i) => {
+    const k = SEASON_OPEN.indexOf(i);
+    if (k < 0) return { label: m, closed: true, value: 0 };
+    const future = i > NOW.getMonth();
+    const v = future ? 0 : i === NOW.getMonth() ? Math.round(BOOKED[k] * NOW.getDate() / 30) : BOOKED[k];
+    return { label: m, value: v, part: future ? null : Math.round(WEEKEND[k] * v / BOOKED[k]), highlight: i === NOW.getMonth(), tip: `${v} court-hours, ${Math.round(WEEKEND[k] * v / BOOKED[k])} at weekends` };
+  });
+  const soFar = sum(data, d => d.value);
+  const capSeason = Math.round(capMonth * 10);
+  return h(Frag, null,
+    h(PageHead, { title: 'Season', sub: `${CLUB} is open 10 months a year, February to November, ${HOURS_PER_WEEK} hours a week. The quiet months are handled before they arrive.` }),
+    h('div', { className: 'kpis' },
+      h(Kpi, { label: 'Court-hours a season', value: capSeason.toLocaleString('en-GB'), sub: `${HOURS_PER_WEEK} h × ${COURTS.length} courts × ~43 weeks` }),
+      h(Kpi, { label: 'Sold this season', value: soFar.toLocaleString('en-GB'), sub: pct(soFar / capSeason) + ' of the season so far' }),
+      h(Kpi, { label: 'Season ends', value: `${seasonEnd.getDate()} ${MON[seasonEnd.getMonth()]}`, sub: daysToSeasonEnd ? `In ${daysToSeasonEnd} days` : 'Today', tone: daysToSeasonEnd <= 45 ? 'warn' : null }),
+      h(Kpi, { label: 'Reopens', value: `${reopen.getDate()} ${MON[reopen.getMonth()]} ${reopen.getFullYear()}`, sub: 'Bookings open 10 days before' })),
+    h(Card, { title: 'Months open' },
+      h('div', { className: 'month-grid' }, MON.map((m, i) => h('div', { key: m, className: `month ${SEASON_OPEN.includes(i) ? 'open' : 'closed'} ${i === NOW.getMonth() ? 'now' : ''}` }, m)))),
+    h('div', { className: 'grid-2' },
+      h(Card, { title: 'Court-hours sold each month', right: h('span', { className: 'legend' }, h('span', null, h('i', { style: { background: 'var(--warn)', borderColor: 'transparent' } }), 'Weekends')) },
+        h(BarChart, { data, label: 'Court-hours sold per month', max: niceMax(capMonth) }),
+        h('p', { className: 'tiny muted', style: { marginTop: 6 } }, `Capacity is about ${Math.round(capMonth)} court-hours a month. Weekends are the amber part of each bar. Sample figures.`)),
+      h(Card, { title: 'Opening hours' },
+        h('table', { className: 'tbl hours-tbl' }, h('tbody', null, [1, 2, 3, 4, 5, 6, 0].map(dow => {
+          const hrs = HOURS[dow] || [];
+          return h('tr', { key: dow }, h('td', null, h('b', null, DOW_LONG[dow])), h('td', { className: 'nums' }, hrs.length ? `${hh(hrs[0])}–${hh(hrs[hrs.length - 1] + 1)}` : 'Closed'), h('td', { className: 'r muted' }, `${hrs.length} h`));
+        }), h('tr', null, h('td', null, h('b', null, 'Total')), h('td'), h('td', { className: 'r' }, h('b', null, `${HOURS_PER_WEEK} h`))))),
+        h('p', { className: 'tiny muted', style: { marginTop: 8 } }, 'Sample hours. Bookings, reminders and offers only ever use the hours the club is open.'))),
+    h(Card, { title: 'Closing for the winter, and coming back full' },
+      h('div', { className: 'timeline' },
+        [
+          ['3 weeks before', 'Season Pass early bird on WhatsApp', `Everyone who played this season gets the ${reopen.getFullYear()} Season Pass at £79 instead of £99.`, 'season'],
+          ['Last week', 'Free-game vouchers reminder', 'Players with unused free games are told to use them before the close, so they come in once more.', null],
+          ['Closed months', 'Memberships pause', 'Regular and Weekend Club stop billing in December and January and restart on 1 February. Nobody pays for months they can\'t play.', null],
+          ['10 days before', 'Reopening message', 'Opening-week courts go on sale; Season Pass holders get first pick.', 'reopen'],
+          ['Opening week', 'Welcome back', 'Free-game cards carry over, so players pick up where they left off.', null]
+        ].map(([t, a, b, id]) => h('div', { key: a, className: 'tl' }, h('span', { className: 't' }, t), h('span', { className: `rail ${id && flowsOn[id] ? 'done' : ''}` }),
+          h('div', { className: 'b' }, h('div', { className: 'spread' }, h('b', null, a), id && h(Switch, { on: flowsOn[id], label: a, onChange: v => { setFlowsOn(o => ({ ...o, [id]: v })); toast(`${a}: ${v ? 'scheduled' : 'paused'}.`); } })), h('div', { className: 'small muted' }, b)))))));
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+
+</script>
+</body>
+</html>
